@@ -21,9 +21,9 @@
 
 ## 📖 Overview
 
-**ConnectHub** is a cross-platform social and community mobile application built with **Flutter** and **Firebase**. It enables users to create profiles, share posts with media, interact through likes and comments, engage in real-time messaging, discover nearby community events via maps, and receive push notifications for relevant activity.
+**NanheNest** is a cross-platform social and community mobile application built with **Flutter** and **Firebase**. It enables users to create profiles, share posts with media, interact through likes and comments, engage in real-time messaging, discover nearby community events via maps, and receive push notifications for relevant activity.
 
-ConnectHub targets **Android** (primary) and **iOS** (secondary) platforms through Flutter's cross-platform framework with a fully serverless Firebase backend.
+NanheNest targets **Android** (primary) and **iOS** (secondary) platforms through Flutter's cross-platform framework with a fully serverless Firebase backend.
 
 ---
 
@@ -46,13 +46,13 @@ ConnectHub targets **Android** (primary) and **iOS** (secondary) platforms throu
 
 ## 🏗 Architecture
 
-ConnectHub follows a **three-tier client-serverless architecture** combined with the **MVVM pattern** on the client side.
+NanheNest follows a **three-tier client-serverless architecture** combined with the **MVVM pattern** on the client side.
 
 ```
 ┌─────────────────────────────────────────────────┐
 │              CLIENT TIER                        │
 │   Flutter Mobile App (Android / iOS)            │
-│   Screens │ Widgets │ Navigation │ Riverpod      │
+│   Screens │ Widgets │ Navigation │ Riverpod     │
 └────────────────────┬────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────┐
@@ -89,7 +89,7 @@ ConnectHub follows a **three-tier client-serverless architecture** combined with
 ## 📁 Project Structure
 
 ```
-connecthub/
+nanhenest/
 ├── lib/
 │   ├── main.dart              # App entry point, theme config, route setup
 │   ├── config/                # Firebase config, constants, theme data
@@ -350,7 +350,7 @@ Each service class encapsulates all Firebase interactions for a specific domain 
 
 ## 🔄 State Management
 
-ConnectHub uses **Riverpod 2.x** for reactive, testable state management.
+NanheNest uses **Riverpod 2.x** for reactive, testable state management.
 
 | Provider | Type | Purpose |
 |----------|------|---------|
@@ -773,14 +773,240 @@ GitHub Actions
 
 ---
 
+## 🔧 Concept 2: Firebase Authentication & Storage Implementation
+
+This section documents the implementation of **Concept 2**, which focuses on integrating Firebase Authentication and Firebase Storage into NanheNest.
+
+### Firebase Authentication (`lib/services/auth_service.dart`)
+
+The `AuthService` class manages all authentication operations:
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `signUp(email, password, name)` | `Future<UserCredential>` | Register new user + create `/users` doc in Firestore |
+| `signIn(email, password)` | `Future<UserCredential>` | Authenticate existing user |
+| `signOut()` | `Future<void>` | Sign out + clear local session |
+| `resetPassword(email)` | `Future<void>` | Send password reset email |
+| `authStateChanges()` | `Stream<User?>` | Stream of auth state for session persistence |
+| `updateFcmToken(token)` | `Future<void>` | Store FCM token in user document |
+| `updateLastActive()` | `Future<void>` | Update user's last active timestamp |
+| `currentUser` | `User?` | Get currently authenticated user |
+
+**Features:**
+
+- Email/password authentication with Firebase Auth
+- Automatic user document creation in Firestore upon signup
+- Comprehensive error handling with user-friendly messages
+- Real-time auth state listening for route guards
+- Session persistence across app restarts
+
+### Firebase Storage (`lib/services/storage_service.dart`)
+
+The `StorageService` class handles all file upload and download operations:
+
+| Method | Return Type | Description |
+| ------ | ----------- | ----------- |
+| `uploadUserAvatar(userId, imageFile)` | `Future<String>` | Upload + compress user profile image |
+| `uploadPostImage(postId, imageFile)` | `Future<String>` | Upload post image with compression |
+| `uploadEventImage(eventId, imageFile)` | `Future<String>` | Upload event banner image |
+| `uploadChatMedia(chatId, mediaFile)` | `Future<String>` | Upload media shared in chats |
+| `deleteFile(filePath)` | `Future<void>` | Delete file from Firebase Storage |
+| `deleteUserAvatar(userId)` | `Future<void>` | Delete user avatar |
+| `getDownloadURL(filePath)` | `Future<String>` | Get public download URL for a file |
+
+**Features:**
+
+- Automatic image compression (80% quality, min 1024x1024)
+- Organized folder structure for different content types
+- Metadata tagging (content-type, timestamps)
+- Error recovery with fallback to original file
+- File deletion support with automatic error handling
+
+### Data Models
+
+**UserModel** (`lib/models/user_model.dart`):
+- Stores user profile data (uid, email, displayName, avatar, bio)
+- Firestore serialization/deserialization methods
+- CopyWith pattern for immutability
+- Activity tracking (postCount, followerCount, followingCount)
+
+**BookingModel** (`lib/models/booking_model.dart`):
+- Represents community events/bookings
+- GeoPoint location support for map integration
+- Attendee list management
+- Helper methods: `userIsAttending()`, `isUpcoming()`
+
+### Firebase Security Rules
+
+#### Firestore Rules
+
+```firestore
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - owner write only
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == uid;
+    }
+
+    // Posts collection - public read, authenticated write
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth.uid == resource.data.authorUid;
+
+      // Comments subcollection
+      match /comments/{commentId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null;
+        allow delete: if request.auth.uid == resource.data.authorUid;
+      }
+    }
+
+    // Events collection - public read, authenticated write
+    match /events/{eventId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth.uid == resource.data.creatorUid;
+    }
+  }
+}
+```
+
+#### Storage Rules
+
+```firestore
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Avatars - max 5MB, owner write only
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId &&
+                      request.resource.size < 5 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Posts - max 10MB, authenticated users
+    match /posts/{postId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                      request.resource.size < 10 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Events - max 10MB, authenticated users
+    match /events/{eventId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                      request.resource.size < 10 * 1024 * 1024 &&
+                      request.resource.contentType.matches('image/.*');
+    }
+
+    // Chat media - max 10MB, authenticated users
+    match /chat_media/{chatId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+                      request.resource.size < 10 * 1024 * 1024;
+    }
+  }
+}
+```
+
+### Firestore Collection Schema
+
+#### `/users` Collection
+```
+users/{uid}
+├── email         : String
+├── displayName   : String
+├── avatarUrl     : String (URL from Storage)
+├── bio           : String
+├── postCount     : Number
+├── followerCount : Number
+├── followingCount: Number
+├── fcmToken      : String
+├── createdAt     : Timestamp
+└── lastActive    : Timestamp
+```
+
+#### `/events` Collection
+```
+events/{eventId}
+├── creatorUid    : String
+├── title         : String
+├── description   : String
+├── location      : GeoPoint (latitude, longitude)
+├── address       : String
+├── eventDateTime : Timestamp
+├── imageUrl      : String? (URL from Storage)
+├── attendees     : Array<String> (list of user UIDs)
+├── isActive      : Boolean
+└── createdAt     : Timestamp
+```
+
+### Setup Instructions
+
+1. **Add Firebase to pubspec.yaml:**
+
+   ```yaml
+   dependencies:
+     firebase_core: ^2.24.0
+     firebase_auth: ^4.11.0
+     firebase_storage: ^11.5.0
+     cloud_firestore: ^4.14.0
+   ```
+
+2. **Configure Firebase:**
+
+   ```bash
+   flutterfire configure
+   ```
+
+3. **Set up Security Rules:**
+
+   Deploy Firestore and Storage rules via Firebase Console or CLI:
+
+   ```bash
+   firebase deploy --only firestore:rules
+   firebase deploy --only storage
+   ```
+
+4. **Initialize in main.dart:**
+
+   ```dart
+   await Firebase.initializeApp(
+     options: DefaultFirebaseOptions.currentPlatform,
+   );
+   ```
+
+### Error Handling
+
+Authentication errors are mapped to user-friendly messages:
+
+- `weak-password` → "The password provided is too weak."
+- `email-already-in-use` → "An account already exists for that email."
+- `invalid-email` → "The email address is not valid."
+- `user-not-found` → "No user found for that email."
+- `wrong-password` → "Wrong password provided."
+
+Storage errors include:
+
+- Permission denied → Check Security Rules
+- Quota exceeded → User storage limit reached
+- File not found → Graceful retry or placeholder
+
+---
+
 ## 📄 License
 
-This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the ConnectHub team.
+This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
 
 ---
 
 <div align="center">
 
-Made with ❤️ by Team ConnectHub — Sprint #2, March 2026
+Made with ❤️ by Team NanheNest — Sprint #2, March 2026
 
 </div>
