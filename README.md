@@ -6,7 +6,7 @@
 <img src="https://img.shields.io/badge/Riverpod-2.x-00897B?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=google-maps&logoColor=white" />
 
-# ConnectHub
+
 
 ### Social & Community Mobile Application
 
