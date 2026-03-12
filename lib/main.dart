@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'services/auth_service.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/home/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,60 +41,51 @@ class NanheNestApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      home: const AuthGate(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+/// AuthGate handles navigation based on authentication state
+class AuthGate extends StatefulWidget {
+  const AuthGate({Key? key}) : super(key: key);
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  final _authService = AuthService();
+  bool _showLoginScreen = true;
+
+  void _toggleAuthScreen() {
+    setState(() => _showLoginScreen = !_showLoginScreen);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('NanheNest'),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.people,
-              size: 64,
-              color: Colors.blue,
+    return StreamBuilder<User?>(
+      stream: _authService.authStateChanges(),
+      builder: (context, snapshot) {
+        // Show loading spinner while checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Welcome to NanheNest',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Your social and community mobile application',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Firebase initialized successfully!'),
-                  ),
-                );
-              },
-              child: const Text('Get Started'),
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        // User is logged in
+        if (snapshot.hasData) {
+          return const DashboardScreen();
+        }
+
+        // User is not logged in - show auth screens
+        return _showLoginScreen
+            ? LoginScreen(onSignUpTap: _toggleAuthScreen)
+            : SignUpScreen(onLoginTap: _toggleAuthScreen);
+      },
     );
   }
 }
