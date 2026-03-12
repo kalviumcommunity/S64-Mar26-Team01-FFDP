@@ -999,6 +999,313 @@ Storage errors include:
 
 ---
 
+## 🔥 Concept 3.10: Firebase Authentication & Firestore Integration
+
+This section documents the implementation of **Concept 3.10**, which provides complete Firebase Authentication and Firestore CRUD operations for the NanheNest application.
+
+### Overview
+
+Concept 3.10 extends the Firebase integration with:
+- **Complete Auth Flow**: Sign-up, login, logout, and password reset functionality
+- **Real-time UI Navigation**: Auth state-based routing with `StreamBuilder`
+- **Firestore CRUD Operations**: Create, read, update, and delete posts and user data
+- **Real-time Data Sync**: Firestore `StreamBuilder` for live feed updates
+- **Production-Ready Screens**: Login, signup, and dashboard screens with full validation
+
+### Authentication Flow
+
+#### AuthService (`lib/services/auth_service.dart`)
+
+Complete authentication service with:
+- User registration with automatic Firestore document creation
+- Email/password login with error handling
+- Logout functionality
+- Password reset via email
+- FCM token management
+- Last active timestamp tracking
+- Auth state stream for session persistence
+
+```dart
+// Sign up example
+await authService.signUp(
+  email: 'user@example.com',
+  password: 'SecurePass123',
+  displayName: 'John Doe',
+);
+
+// Sign in example
+await authService.signIn(
+  email: 'user@example.com',
+  password: 'SecurePass123',
+);
+
+// Listen to auth state
+authService.authStateChanges().listen((user) {
+  if (user != null) {
+    print('User logged in: ${user.email}');
+  } else {
+    print('User logged out');
+  }
+});
+```
+
+### Firestore Operations
+
+#### FirestoreService (`lib/services/firestore_service.dart`)
+
+Comprehensive CRUD service with:
+
+| Operation | Method | Returns | Description |
+|-----------|--------|---------|-------------|
+| **Create** | `createPost(uid, content, displayName)` | `Future<String>` | Create post + return post ID |
+| **Read** | `getPostsStream()` | `Stream<List<Map>>` | Real-time feed of all posts |
+| **Read** | `getUserPostsStream(uid)` | `Stream<List<Map>>` | Real-time posts by specific user |
+| **Update** | `updatePost(postId, content)` | `Future<void>` | Edit post content |
+| **Delete** | `deletePost(postId)` | `Future<void>` | Remove post from Firestore |
+| **Interaction** | `likePost(postId)` | `Future<void>` | Increment like count |
+| **Interaction** | `unlikePost(postId)` | `Future<void>` | Decrement like count |
+| **User** | `updateUserProfile(uid, ...)` | `Future<void>` | Update profile fields |
+| **User** | `getUserDocument(uid)` | `Future<UserModel?>` | Fetch single user profile |
+| **User** | `getUserStream(uid)` | `Stream<UserModel?>` | Real-time user data |
+
+```dart
+// Create a post
+final postId = await firestoreService.createPost(
+  uid: 'user123',
+  content: 'Hello NanheNest!',
+  displayName: 'John Doe',
+);
+
+// Listen to feed in real-time
+firestoreService.getPostsStream().listen((posts) {
+  setState(() => _posts = posts);
+});
+
+// Update user profile
+await firestoreService.updateUserProfile(
+  uid: 'user123',
+  displayName: 'John Updated',
+  bio: 'A Flutter enthusiast',
+);
+```
+
+### UI Components
+
+#### Login Screen (`lib/screens/auth/login_screen.dart`)
+
+Features:
+- Email and password input fields with validation
+- Password visibility toggle
+- "Forgot Password" functionality
+- Sign-up navigation
+- Loading state during authentication
+- Error handling with SnackBar feedback
+
+```dart
+LoginScreen(
+  onSignUpTap: () => _toggleAuthScreen(),
+)
+```
+
+#### Sign-Up Screen (`lib/screens/auth/signup_screen.dart`)
+
+Features:
+- Full name, email, password, confirm password fields
+- Form validation
+- Terms and conditions checkbox
+- Password matching validation
+- Account creation with automatic Firestore user doc
+- Error messages for each validation rule
+
+```dart
+SignUpScreen(
+  onLoginTap: () => _toggleAuthScreen(),
+)
+```
+
+#### Dashboard Screen (`lib/screens/home/dashboard_screen.dart`)
+
+Features:
+- User profile section with email and display name
+- Create post form with text input
+- Real-time feed with StreamBuilder
+- Post display with creator, timestamp, content, and stats
+- Like and comment counters
+- Delete post functionality (owner only)
+- Logout button
+- Empty state placeholder
+
+```dart
+// Real-time feed updates
+StreamBuilder<List<Map<String, dynamic>>>(
+  stream: _firestoreService.getPostsStream(),
+  builder: (context, snapshot) {
+    if (snapshot.hasData) {
+      return ListView(children: buildPostCards(snapshot.data!));
+    }
+    return CircularProgressIndicator();
+  },
+)
+```
+
+### Authentication State Management
+
+#### AuthGate Widget (`lib/main.dart`)
+
+Handles app-level routing based on authentication state:
+
+```dart
+StreamBuilder<User?>(
+  stream: authService.authStateChanges(),
+  builder: (context, snapshot) {
+    // Loading state
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Authenticated: show dashboard
+    if (snapshot.hasData) {
+      return DashboardScreen();
+    }
+
+    // Not authenticated: show auth screens
+    return LoginScreen(onSignUpTap: toggleScreen);
+  },
+)
+```
+
+### Firestore Data Structure for 3.10
+
+#### Posts Collection
+```
+posts/{postId}
+├── uid             : String (creator's user ID)
+├── displayName     : String (creator's name)
+├── content         : String (post text)
+├── imageUrl        : String? (optional image)
+├── likes           : Number (like count)
+├── comments        : Number (comment count)
+├── createdAt       : Timestamp
+└── updatedAt       : Timestamp
+```
+
+#### Users Subcollection (from AuthService)
+```
+users/{uid}
+├── email           : String
+├── displayName     : String
+├── avatarUrl       : String
+├── bio             : String
+├── postCount       : Number
+├── followerCount   : Number
+├── followingCount  : Number
+├── fcmToken        : String
+├── createdAt       : Timestamp
+└── lastActive      : Timestamp
+```
+
+### Key Features Implemented
+
+1. **Email/Password Authentication**
+   - Sign up with validation
+   - Login with error handling
+   - Password reset email
+   - Logout
+
+2. **Real-time Data Sync**
+   - Posts feed updates in real-time
+   - User profile updates instantly
+   - Comment and like counters sync
+
+3. **Post Management**
+   - Create posts with text content
+   - View feed from all users
+   - Delete own posts
+   - Like/unlike functionality
+
+4. **User Profile**
+   - View logged-in user info
+   - Update profile information
+   - Last active timestamp tracking
+
+5. **Error Handling**
+   - Form validation feedback
+   - Firebase exception mapping
+   - User-friendly error messages
+   - Loading states during operations
+
+### Setup for Concept 3.10
+
+1. **Ensure Firebase is initialized** in `main.dart`:
+   ```dart
+   await Firebase.initializeApp(
+     options: DefaultFirebaseOptions.currentPlatform,
+   );
+   ```
+
+2. **Deploy Firestore Security Rules**:
+   ```bash
+   firebase deploy --only firestore:rules
+   ```
+
+3. **Enable Email/Password Auth** in Firebase Console:
+   - Authentication > Sign-in method > Email/Password (enable)
+
+4. **Create Firestore Collections**:
+   - Create `users` collection
+   - Create `posts` collection
+
+5. **Run the app**:
+   ```bash
+   flutter run
+   ```
+
+### Testing Concept 3.10
+
+**Manual Testing Checklist:**
+
+- [ ] Sign up with new email → User document created in Firestore
+- [ ] Log in with valid credentials → Navigate to dashboard
+- [ ] Create post → Post appears in feed immediately
+- [ ] Refresh app → Feed persists (Firestore cached data)
+- [ ] Delete post → Post removed from feed and Firestore
+- [ ] Logout → Navigate back to login screen
+- [ ] Test password reset → Email received with reset link
+- [ ] Try invalid email format → Validation error shown
+- [ ] Try weak password → Firebase error message displayed
+- [ ] Try duplicate email signup → "Email already in use" error
+
+### Learning Outcomes
+
+By implementing Concept 3.10, you'll understand:
+
+1. **Firebase Authentication**: How to manage user sessions and secure access
+2. **Firestore CRUD**: Real-time database operations with Dart models
+3. **Stream-based UI**: Using StreamBuilder for reactive data display
+4. **Error Handling**: Proper exception handling and user feedback
+5. **State Management**: Auth state as the basis for app navigation
+6. **Real-time Sync**: How Firestore pushes updates to all connected clients
+7. **Security**: Basic Firestore rules to protect user data
+8. **UI/UX**: Form validation, loading states, and error messaging
+
+### Challenges & Solutions
+
+**Challenge 1: Real-time updates not showing**
+- Solution: Ensure Firestore security rules allow read access for authenticated users
+
+**Challenge 2: Auth state not persisting**
+- Solution: Firebase handles persistence automatically; restart app to verify
+
+**Challenge 3: Stream rebuilds too often**
+- Solution: Use `distinct()` or `.map()` to filter unnecessary updates
+
+**Challenge 4: Form validation not working**
+- Solution: Wrap form in `GlobalKey<FormState>()` and call `validate()` before submit
+
+---
+
 ## 📄 License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
