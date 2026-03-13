@@ -1306,6 +1306,226 @@ By implementing Concept 3.10, you'll understand:
 
 ---
 
+## 📁 Concept 3.12: Flutter Project Structure Exploration
+
+This section documents **Concept 3.12**, which explores and documents the Flutter project folder structure, best practices for code organization, and how this structure supports team collaboration and scalability.
+
+### Overview
+
+Understanding the Flutter project structure is crucial for:
+- **Code Organization**: Keeping code clean and maintainable
+- **Team Collaboration**: Enabling multiple developers to work simultaneously
+- **Scalability**: Supporting project growth without architectural changes
+- **Performance**: Organizing code for efficient lazy loading and optimization
+- **Testing**: Separating business logic for easier unit testing
+
+### Project Structure Breakdown
+
+Our project follows a **feature-based organization** combined with **layered architecture**:
+
+```
+S64-Mar26-Team01-FFDP/
+│
+├── lib/                          # Core application code
+│   ├── main.dart                 # App entry point & Firebase initialization
+│   ├── firebase_options.dart     # Firebase configuration
+│   ├── concept_demo.dart         # Demo/test implementations
+│   │
+│   ├── screens/                  # UI Screens (organized by feature)
+│   │   ├── auth/
+│   │   │   ├── login_screen.dart
+│   │   │   └── signup_screen.dart
+│   │   └── home/
+│   │       └── dashboard_screen.dart
+│   │
+│   ├── services/                 # Business logic & API calls
+│   │   ├── auth_service.dart
+│   │   ├── firestore_service.dart
+│   │   └── storage_service.dart
+│   │
+│   ├── models/                   # Data models & entities
+│   │   ├── user_model.dart
+│   │   └── booking_model.dart
+│   │
+│   └── widgets/                  # Reusable UI components
+│       ├── custom_text_field.dart
+│       └── primary_button.dart
+│
+├── android/                      # Android build configuration
+├── ios/                          # iOS build configuration
+│
+├── assets/                       # Static resources (images, fonts)
+├── test/                         # Automated tests
+│
+├── docs/                         # Project documentation
+│   ├── setup_guide.md
+│   ├── PROJECT_STRUCTURE.md      # Detailed folder breakdown
+│   ├── concept1/
+│   └── concept3/
+│
+├── pubspec.yaml                  # Dependencies & asset configuration
+└── README.md                     # Main documentation
+```
+
+### Folder & File Purposes
+
+| Folder | Purpose | Contains |
+|--------|---------|----------|
+| **lib/** | Core app code | Screens, services, models, widgets |
+| **lib/screens/** | UI screens | Login, signup, dashboard screens |
+| **lib/services/** | Business logic | Firebase, auth, storage operations |
+| **lib/models/** | Data structures | UserModel, BookingModel |
+| **lib/widgets/** | Reusable UI | CustomTextField, PrimaryButton |
+| **android/** | Android config | Build scripts, manifest, resources |
+| **ios/** | iOS config | Info.plist, Xcode settings |
+| **assets/** | Static files | Images, fonts, JSON data |
+| **test/** | Automated tests | Unit & widget tests |
+| **docs/** | Documentation | Guides, structure docs, submissions |
+
+### Why This Structure?
+
+#### ✅ **Scalability**
+- New features added to appropriate folders without disrupting existing code
+- Clear boundaries between layers prevent spaghetti code
+- Easy to add new screens, services, or models following the pattern
+
+#### ✅ **Team Collaboration**
+- Different developers can work on auth, home, and services simultaneously
+- Clear naming and organization reduce merge conflicts
+- New team members understand structure quickly
+
+#### ✅ **Maintainability**
+- Business logic separated from UI (services vs screens)
+- Data models centralized in one folder
+- Reusable widgets prevent code duplication
+
+#### ✅ **Testing**
+- Services can be unit tested independently
+- Widgets can be tested in isolation
+- Clear separation makes mock objects easier to create
+
+### Key Files Explained
+
+#### **pubspec.yaml** — Project Configuration
+Manages dependencies, asset paths, and app metadata:
+```yaml
+name: nanhenest
+description: Social and community mobile application
+version: 1.0.0+1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/fonts/
+```
+
+#### **main.dart** — App Entry Point
+Initializes Firebase and sets up the root widget:
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
+```
+
+#### **android/app/build.gradle** — Android Configuration
+Defines Android-specific settings like minSdkVersion, versionCode, and dependencies.
+
+#### **ios/Runner/Info.plist** — iOS Configuration
+Defines iOS app metadata, permissions, and display settings.
+
+### Code Organization Principles
+
+**1. Separation of Concerns**
+```
+✅ screens/auth/login_screen.dart → UI only
+✅ services/auth_service.dart → Business logic only
+✅ models/user_model.dart → Data structure only
+```
+
+**2. Feature-Based Organization**
+```
+screens/
+├── auth/
+│   ├── login_screen.dart
+│   └── signup_screen.dart
+└── home/
+    └── dashboard_screen.dart
+```
+
+**3. Reusable Components**
+```
+widgets/
+├── custom_text_field.dart
+└── primary_button.dart
+```
+
+**4. Clear Naming Conventions**
+- Screens: `*_screen.dart` (login_screen.dart)
+- Services: `*_service.dart` (auth_service.dart)
+- Models: `*_model.dart` (user_model.dart)
+- Widgets: `*_widget.dart` or descriptive name (custom_text_field.dart)
+
+### Best Practices Applied
+
+✅ **No Code in main.dart** — Used only for initialization and routing
+✅ **Layered Architecture** — UI, services, and models separated
+✅ **DRY (Don't Repeat Yourself)** — Reusable widgets and services
+✅ **Single Responsibility** — Each file has one clear purpose
+✅ **Clear Naming** — File names describe their content
+✅ **Documentation** — Comments explain complex logic
+✅ **Version Control** — .gitignore excludes build artifacts
+
+### For More Details
+
+**See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) for:**
+- Detailed explanation of each folder
+- How this supports scalability
+- How this facilitates team collaboration
+- Examples for different app types
+- Complete checklist
+
+### Learning Outcomes
+
+By exploring Concept 3.12, you understand:
+
+1. **Flutter Project Structure**: Default folders created by `flutter create`
+2. **Organization Best Practices**: Feature-based vs layer-based organization
+3. **Scalability**: How structure supports app growth
+4. **Team Collaboration**: How clear structure reduces conflicts
+5. **Code Reusability**: Where to place shared components
+6. **Cross-Platform Build**: Role of android/ and ios/ folders
+7. **Asset Management**: Declaring and using assets in pubspec.yaml
+8. **Project Configuration**: How pubspec.yaml orchestrates everything
+
+### Reflection
+
+**Why is this structure important?**
+- **Clarity**: Developers know exactly where to find and add code
+- **Consistency**: Team members follow the same patterns
+- **Growth**: Project can scale without major refactoring
+- **Onboarding**: New developers get up to speed quickly
+
+**How does this help teams?**
+- Parallel development without conflicts
+- Code review becomes straightforward
+- Clear responsibility ownership
+- Easier to identify and fix bugs
+- Performance optimization is isolated
+
+---
+
 ## 📄 License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
