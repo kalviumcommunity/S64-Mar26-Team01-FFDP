@@ -1526,6 +1526,152 @@ By exploring Concept 3.12, you understand:
 
 ---
 
+## 🗺️ Concept 3.16: Multi-Screen Navigation Using Navigator and Routes
+
+This section documents **Concept 3.16**, implementing multi-screen navigation using Flutter's `Navigator` class and named routes.
+
+### Navigation Overview
+
+Flutter manages screen transitions via a navigation **stack**. Each `Navigator.push` adds a screen on top; each `Navigator.pop` removes it.
+
+```text
+Stack visualization:
+  [ AuthGate ]          ← initial screen
+  [ HomeScreen ]        ← push '/'
+  [ ProfileScreen ]     ← pushNamed('/profile')
+  [ SettingsScreen ]    ← pushNamed('/settings') ← currently visible
+       ↑ pop() goes back down the stack
+```
+
+### Screens Created
+
+| Screen    | Route        | File                                        |
+| --------- | ------------ | ------------------------------------------- |
+| Home      | `/`          | `lib/screens/home/home_screen.dart`         |
+| Dashboard | `/dashboard` | `lib/screens/home/dashboard_screen.dart`    |
+| Profile   | `/profile`   | `lib/screens/profile/profile_screen.dart`   |
+| Settings  | `/settings`  | `lib/screens/settings/settings_screen.dart` |
+| About     | `/about`     | `lib/screens/about/about_screen.dart`       |
+| Login     | `/login`     | `lib/screens/auth/login_screen.dart`        |
+| Sign Up   | `/signup`    | `lib/screens/auth/signup_screen.dart`       |
+
+### Route Definitions — `lib/routes/app_routes.dart`
+
+All routes are centralized in `AppRoutes`:
+
+```dart
+class AppRoutes {
+  static const String home      = '/';
+  static const String profile   = '/profile';
+  static const String settings  = '/settings';
+  static const String about     = '/about';
+  static const String dashboard = '/dashboard';
+
+  static Map<String, WidgetBuilder> get routes => {
+    home:      (_) => const HomeScreen(),
+    profile:   (_) => const ProfileScreen(),
+    settings:  (_) => const SettingsScreen(),
+    about:     (_) => const AboutScreen(),
+    dashboard: (_) => const DashboardScreen(),
+  };
+}
+```
+
+### Wired in `main.dart`
+
+```dart
+return MaterialApp(
+  routes: AppRoutes.routes,   // all named routes registered here
+  home: const AuthGate(),     // auth-aware entry point
+);
+```
+
+### Navigation in Action
+
+**Push to a screen:**
+
+```dart
+Navigator.pushNamed(context, AppRoutes.profile);
+```
+
+**Push with arguments (data passing between screens):**
+
+```dart
+Navigator.pushNamed(
+  context,
+  AppRoutes.settings,
+  arguments: 'Navigated here from Profile screen',
+);
+```
+
+**Read arguments in the target screen:**
+
+```dart
+final String? message =
+    ModalRoute.of(context)?.settings.arguments as String?;
+```
+
+**Go back:**
+
+```dart
+Navigator.pop(context);
+```
+
+**Pop all the way to root:**
+
+```dart
+Navigator.of(context).popUntil((route) => route.isFirst);
+```
+
+### Navigation Flow Diagram
+
+```text
+[AuthGate]
+    │
+    ├─ (not logged in) → [LoginScreen] ⇄ [SignUpScreen]
+    │
+    └─ (logged in) → [HomeScreen]
+                          │
+                          ├── pushNamed('/dashboard') → [DashboardScreen]
+                          │                                     └── pop() ↩
+                          ├── pushNamed('/profile') ──→ [ProfileScreen]
+                          │                               └── pushNamed('/settings', args)
+                          │                               └── pop() ↩
+                          ├── pushNamed('/settings') → [SettingsScreen]
+                          │                               └── pushNamed('/about')
+                          │                               └── pop() ↩
+                          └── pushNamed('/about') ───→ [AboutScreen]
+                                                          └── pop() ↩
+```
+
+### Why Named Routes?
+
+| Benefit          | Explanation                                                            |
+| ---------------- | ---------------------------------------------------------------------- |
+| **Readability**  | `/profile` is clearer than instantiating `ProfileScreen()` everywhere  |
+| **Centralized**  | Change a route once in `AppRoutes` — all usages update automatically   |
+| **Arguments**    | Pass data cleanly via `arguments` without changing widget constructors |
+| **Deep linking** | Named routes map directly to app deep link paths                       |
+| **Testing**      | Routes are testable independently                                      |
+
+### How Navigator Manages the Stack
+
+1. App starts → `AuthGate` is pushed as root
+2. `Navigator.pushNamed(context, '/profile')` → `ProfileScreen` pushed on top
+3. Inside `ProfileScreen`, `Navigator.pushNamed(context, '/settings')` → `SettingsScreen` on top
+4. `Navigator.pop(context)` in `SettingsScreen` → returns to `ProfileScreen`
+5. `Navigator.pop(context)` in `ProfileScreen` → returns to `HomeScreen`
+
+### 3.16 Learning Outcomes
+
+1. **Navigator Stack**: Screens are managed as a push/pop stack
+2. **Named Routes**: Centralized route map keeps navigation organized
+3. **Arguments**: `ModalRoute.of(context)?.settings.arguments` for data passing
+4. **Auth-aware navigation**: `popUntil(isFirst)` cleanly handles sign-out
+5. **Deep structure**: Routes work across any nesting level in the widget tree
+
+---
+
 ## 📄 License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.

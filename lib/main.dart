@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'routes/app_routes.dart';
 import 'services/auth_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
@@ -41,6 +42,9 @@ class NanheNestApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
+      // Named routes — use Navigator.pushNamed(context, AppRoutes.profile)
+      routes: AppRoutes.routes,
+      // AuthGate is the initial screen; it decides login vs dashboard
       home: const AuthGate(),
     );
   }
