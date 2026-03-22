@@ -19,7 +19,7 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 **NanheNest** is a cross-platform social and community mobile application built with **Flutter** and **Firebase**. It enables users to create profiles, share posts with media, interact through likes and comments, engage in real-time messaging, discover nearby community events via maps, and receive push notifications for relevant activity.
 
@@ -27,7 +27,7 @@ NanheNest targets **Android** (primary) and **iOS** (secondary) platforms throug
 
 ---
 
-## ✨ Features
+##  Features
 
 | # | Feature | Description |
 |---|---------|-------------|
@@ -44,7 +44,7 @@ NanheNest targets **Android** (primary) and **iOS** (secondary) platforms throug
 
 ---
 
-## 🏗 Architecture
+##  Architecture
 
 NanheNest follows a **three-tier client-serverless architecture** combined with the **MVVM pattern** on the client side.
 
@@ -86,7 +86,7 @@ NanheNest follows a **three-tier client-serverless architecture** combined with 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 nanhenest/
@@ -123,7 +123,7 @@ nanhenest/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -210,7 +210,7 @@ flutter run --release
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 
 ```yaml
 dependencies:
@@ -232,7 +232,7 @@ dependencies:
 
 ---
 
-## 🗃 Data Models
+##  Data Models
 
 ### UserModel
 
@@ -301,7 +301,7 @@ class EventModel {
 
 ---
 
-## 🔧 Service Layer
+## Service Layer
 
 Each service class encapsulates all Firebase interactions for a specific domain and is provided as a singleton via Riverpod.
 
@@ -348,9 +348,81 @@ Each service class encapsulates all Firebase interactions for a specific domain 
 
 ---
 
-## 🔄 State Management
+## State Management
 
 NanheNest uses **Riverpod 2.x** for reactive, testable state management.
+
+### Local State Management with setState()
+
+For simple, local UI state that doesn't need to be shared across the app, we use Flutter's built-in `setState()` method. This is demonstrated in our `StateManagementDemo` widget:
+
+#### Key Concepts:
+- **StatefulWidget**: Widgets that can change dynamically based on user interactions
+- **setState()**: Notifies Flutter that the widget's internal state has changed and needs to be rebuilt
+- **Local vs Global State**: Use `setState()` for widget-specific state, Riverpod for app-wide state
+
+#### Implementation Example:
+```dart
+class StateManagementDemo extends StatefulWidget {
+  @override
+  _StateManagementDemoState createState() => _StateManagementDemoState();
+}
+
+class _StateManagementDemoState extends State<StateManagementDemo> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('State Management Demo'),
+        backgroundColor: _counter >= 5 ? Colors.green : Colors.blue,
+      ),
+      body: Container(
+        color: _counter >= 10 ? Colors.amber[100] : Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Button pressed:'),
+              Text('$_counter times', 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ElevatedButton(
+                onPressed: _incrementCounter,
+                child: Text('Increment'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### Conditional UI Updates:
+The demo showcases dynamic UI changes based on state:
+- **App Bar Color**: Changes from blue to green when counter ≥ 5
+- **Background Color**: Changes to amber when counter ≥ 10
+- **Text Color**: Changes to red when milestone is reached
+- **Celebration Message**: Appears when counter ≥ 10
+
+#### Best Practices:
+1. **Always wrap state changes in setState()**: Direct variable updates won't trigger UI rebuilds
+2. **Avoid setState() in build()**: This creates infinite rebuild loops
+3. **Use local state for widget-specific data**: Counter values, form inputs, toggle states
+4. **Keep setState() calls minimal**: Only update the specific data that changed
+
+#### Common Mistakes to Avoid:
+- Updating state without setState(): `counter++;` (won't rebuild UI)
+- Calling setState() in build() method (causes infinite loops)
+- Using setState() for app-wide state (use Riverpod instead)
 
 | Provider | Type | Purpose |
 |----------|------|---------|
@@ -389,7 +461,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
 
 ---
 
-## 🔀 User Flows
+## User Flows
 
 ### 1. Onboarding & Authentication
 
@@ -552,21 +624,21 @@ flowchart TD
 
 ---
 
-## 📱 Navigation Structure
+## Navigation Structure
 
 The app uses a `BottomNavigationBar` with **5 main tabs**, each with its own Navigator stack for independent navigation history.
 
 | # | Tab | Root Screen | Child Screens |
 |---|-----|-------------|---------------|
-| 1 | 🏠 Home | `FeedScreen` | `PostDetailScreen`, `CreatePostScreen`, `UserProfileScreen` |
-| 2 | 🔍 Search | `SearchScreen` | `SearchResultsScreen`, `UserProfileScreen` |
-| 3 | 🗺 Map | `MapScreen` | `EventDetailScreen`, `CreateEventScreen` |
-| 4 | 💬 Chat | `ChatListScreen` | `ChatRoomScreen` |
-| 5 | 👤 Profile | `MyProfileScreen` | `EditProfileScreen`, `SettingsScreen` |
+| 1 | Home | `FeedScreen` | `PostDetailScreen`, `CreatePostScreen`, `UserProfileScreen` |
+| 2 | Search | `SearchScreen` | `SearchResultsScreen`, `UserProfileScreen` |
+| 3 | Map | `MapScreen` | `EventDetailScreen`, `CreateEventScreen` |
+| 4 | Chat | `ChatListScreen` | `ChatRoomScreen` |
+| 5 | Profile | `MyProfileScreen` | `EditProfileScreen`, `SettingsScreen` |
 
 ---
 
-## 🗄 Firestore Database Schema
+## Firestore Database Schema
 
 ### `/users` Collection
 ```
@@ -644,7 +716,7 @@ events/{eventId}
 
 ---
 
-## ☁️ Cloud Functions
+## Cloud Functions
 
 Runtime: **Node.js 18 (TypeScript)**
 
@@ -659,7 +731,7 @@ Runtime: **Node.js 18 (TypeScript)**
 
 ---
 
-## 🔐 Security
+## Security
 
 ### Firestore Security Rules
 
@@ -680,7 +752,7 @@ Runtime: **Node.js 18 (TypeScript)**
 
 ---
 
-## 🛡 Error Handling
+## Error Handling
 
 | Error Type | Handling | User Experience |
 |------------|----------|-----------------|
@@ -740,7 +812,7 @@ flutter test integration_test/
 
 ---
 
-## 📊 Non-Functional Requirements
+## Non-Functional Requirements
 
 | Category | Requirement |
 |----------|-------------|
@@ -754,7 +826,7 @@ flutter test integration_test/
 
 ---
 
-## 🔁 CI/CD Pipeline
+## CI/CD Pipeline
 
 ```
 Push / PR to main
@@ -773,7 +845,7 @@ GitHub Actions
 
 ---
 
-## 🔧 Concept 2: Firebase Authentication & Storage Implementation
+## Concept 2: Firebase Authentication & Storage Implementation
 
 This section documents the implementation of **Concept 2**, which focuses on integrating Firebase Authentication and Firebase Storage into NanheNest.
 
@@ -999,7 +1071,7 @@ Storage errors include:
 
 ---
 
-## 🔥 Concept 3.10: Firebase Authentication & Firestore Integration
+## Concept 3.10: Firebase Authentication & Firestore Integration
 
 This section documents the implementation of **Concept 3.10**, which provides complete Firebase Authentication and Firestore CRUD operations for the NanheNest application.
 
@@ -1306,7 +1378,7 @@ By implementing Concept 3.10, you'll understand:
 
 ---
 
-## 📁 Concept 3.12: Flutter Project Structure Exploration
+## Concept 3.12: Flutter Project Structure Exploration
 
 This section documents **Concept 3.12**, which explores and documents the Flutter project folder structure, best practices for code organization, and how this structure supports team collaboration and scalability.
 
@@ -1384,22 +1456,22 @@ S64-Mar26-Team01-FFDP/
 
 ### Why This Structure?
 
-#### ✅ **Scalability**
+#### **Scalability**
 - New features added to appropriate folders without disrupting existing code
 - Clear boundaries between layers prevent spaghetti code
 - Easy to add new screens, services, or models following the pattern
 
-#### ✅ **Team Collaboration**
+#### **Team Collaboration**
 - Different developers can work on auth, home, and services simultaneously
 - Clear naming and organization reduce merge conflicts
 - New team members understand structure quickly
 
-#### ✅ **Maintainability**
+#### **Maintainability**
 - Business logic separated from UI (services vs screens)
 - Data models centralized in one folder
 - Reusable widgets prevent code duplication
 
-#### ✅ **Testing**
+#### **Testing**
 - Services can be unit tested independently
 - Widgets can be tested in isolation
 - Clear separation makes mock objects easier to create
@@ -1449,9 +1521,9 @@ Defines iOS app metadata, permissions, and display settings.
 
 **1. Separation of Concerns**
 ```
-✅ screens/auth/login_screen.dart → UI only
-✅ services/auth_service.dart → Business logic only
-✅ models/user_model.dart → Data structure only
+screens/auth/login_screen.dart → UI only
+services/auth_service.dart → Business logic only
+models/user_model.dart → Data structure only
 ```
 
 **2. Feature-Based Organization**
@@ -1479,13 +1551,13 @@ widgets/
 
 ### Best Practices Applied
 
-✅ **No Code in main.dart** — Used only for initialization and routing
-✅ **Layered Architecture** — UI, services, and models separated
-✅ **DRY (Don't Repeat Yourself)** — Reusable widgets and services
-✅ **Single Responsibility** — Each file has one clear purpose
-✅ **Clear Naming** — File names describe their content
-✅ **Documentation** — Comments explain complex logic
-✅ **Version Control** — .gitignore excludes build artifacts
+**No Code in main.dart** — Used only for initialization and routing
+**Layered Architecture** — UI, services, and models separated
+**DRY (Don't Repeat Yourself)** — Reusable widgets and services
+**Single Responsibility** — Each file has one clear purpose
+**Clear Naming** — File names describe their content
+**Documentation** — Comments explain complex logic
+**Version Control** — .gitignore excludes build artifacts
 
 ### For More Details
 
@@ -1526,7 +1598,7 @@ By exploring Concept 3.12, you understand:
 
 ---
 
-## 🗺️ Concept 3.16: Multi-Screen Navigation Using Navigator and Routes
+## Concept 3.16: Multi-Screen Navigation Using Navigator and Routes
 
 This section documents **Concept 3.16**, implementing multi-screen navigation using Flutter's `Navigator` class and named routes.
 
@@ -1672,7 +1744,7 @@ Navigator.of(context).popUntil((route) => route.isFirst);
 
 ---
 
-## 📄 License
+## License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
 
@@ -1680,6 +1752,6 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 <div align="center">
 
-Made with ❤️ by Team NanheNest — Sprint #2, March 2026
+Made by Team NanheNest — Sprint #2, March 2026
 
 </div>
