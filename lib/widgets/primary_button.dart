@@ -16,25 +16,28 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We use a SizedBox to easily control the button's dimensions across layouts
+    final theme = Theme.of(context);
     return SizedBox(
-      width: double.infinity, // Automatically fills the available horizontal space
-      height: 56.0, // Standard minimum touch target height per Material guidelines
+      width: double.infinity,
+      height: 56.0,
       child: FilledButton(
         style: FilledButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), // Modern rounded corners
+            borderRadius: BorderRadius.circular(16),
           ),
+          elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         ),
         onPressed: isLoading ? null : onPressed,
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 height: 24,
                 width: 24,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
+                  strokeWidth: 2,
+                  color: theme.colorScheme.onPrimary,
                 ),
               )
             : Row(
@@ -46,10 +49,10 @@ class PrimaryButton extends StatelessWidget {
                   ],
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
+                      color: theme.colorScheme.onPrimary,
                     ),
                   ),
                 ],
