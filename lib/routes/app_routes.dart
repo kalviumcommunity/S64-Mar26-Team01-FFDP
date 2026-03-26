@@ -8,6 +8,7 @@ import '../screens/settings/settings_screen.dart';
 import '../screens/about/about_screen.dart';
 import '../screens/devtools_demo_screen.dart';
 import '../screens/state_management_demo.dart';
+import '../screens/animations/animation_demo_screen.dart';
 /// Centralized named route definitions for NanheNest.
 ///
 /// Usage:
@@ -27,6 +28,7 @@ class AppRoutes {
   static const String about = '/about';
   static const String devToolsDemo = '/devtools-demo';
   static const String stateManagementDemo = '/state-management-demo';
+  static const String animationDemo = '/animation-demo';
 
   /// All named routes registered in MaterialApp
   static Map<String, WidgetBuilder> get routes => {
@@ -43,5 +45,6 @@ class AppRoutes {
         about: (_) => const AboutScreen(),
         devToolsDemo: (_) => const DevToolsDemoScreen(),
         stateManagementDemo: (_) => const StateManagementDemo(),
+        animationDemo: (_) => const AnimationDemoScreen(),
       };
 }
