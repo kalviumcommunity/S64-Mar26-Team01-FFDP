@@ -1,36 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart';
+import 'core/config/firebase_bootstrap.dart';
 import 'routes/app_routes.dart';
 import 'services/auth_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home/dashboard_screen.dart';
 
-// Top-level function to verify Firebase connection
-Future<void> verifyFirebaseConnection() async {
-  try {
-    final app = Firebase.app();
-    debugPrint('✅ Firebase Verification: Successfully connected to project -> ${app.options.projectId}');
-  } catch (e) {
-    debugPrint('❌ Firebase Verification Failed: No default app found. $e');
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Initialize Firebase with platform-specific options
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    
-    // Verify Firebase connection as per prompt requirements
-    await verifyFirebaseConnection();
+    // Initialize Firebase using the core configuration wrapper
+    await FirebaseBootstrap.initialize();
   } catch (e, stack) {
-    debugPrint('🚨 Firebase Initialization Failed!');
+    debugPrint('🚨 Unhandled Firebase error at startup!');
     debugPrint('Error: $e');
     debugPrint('Stack: $stack');
     

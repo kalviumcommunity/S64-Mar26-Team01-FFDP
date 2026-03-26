@@ -92,7 +92,9 @@ NanheNest follows a **three-tier client-serverless architecture** combined with 
 nanhenest/
 ├── lib/
 │   ├── main.dart              # App entry point, theme config, route setup
-│   ├── config/                # Firebase config, constants, theme data
+│   ├── core/
+│   │   └── config/            # Firebase bootstrap and initialization wrapper
+│   ├── config/                # App config, constants, theme data
 │   ├── models/                # Data model classes (User, Post, Event, etc.)
 │   ├── providers/             # Riverpod providers for state management
 │   ├── services/              # Firebase service wrappers
@@ -161,6 +163,8 @@ cd S64-Mar26-Team01-FFDP
 dart pub global activate flutterfire_cli
 flutterfire configure
 ```
+
+*Note: The project uses a custom `FirebaseBootstrap` class (`lib/core/config/firebase_bootstrap.dart`) to robustly initialize Firebase across all platforms (including explicit iOS and macOS support) and provides an integrated fallback UI for startup errors.*
 
 ### 4. Add Google Maps API Key
 
