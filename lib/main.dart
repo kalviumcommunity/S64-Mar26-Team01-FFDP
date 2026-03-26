@@ -8,15 +8,72 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home/dashboard_screen.dart';
 
+// Top-level function to verify Firebase connection
+Future<void> verifyFirebaseConnection() async {
+  try {
+    final app = Firebase.app();
+    debugPrint('✅ Firebase Verification: Successfully connected to project -> ${app.options.projectId}');
+  } catch (e) {
+    debugPrint('❌ Firebase Verification Failed: No default app found. $e');
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with platform-specific options
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    // Initialize Firebase with platform-specific options
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Verify Firebase connection as per prompt requirements
+    await verifyFirebaseConnection();
+  } catch (e, stack) {
+    debugPrint('🚨 Firebase Initialization Failed!');
+    debugPrint('Error: $e');
+    debugPrint('Stack: $stack');
+    
+    // In a production app, handle fallback logic here.
+    runApp(const FirebaseErrorApp());
+    return;
+  }
 
   runApp(const NanheNestApp());
+}
+
+class FirebaseErrorApp extends StatelessWidget {
+  const FirebaseErrorApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+             padding: const EdgeInsets.all(16.0),
+             child: Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: const [
+                 Icon(Icons.error_outline, color: Colors.red, size: 48),
+                 SizedBox(height: 16),
+                 Text(
+                   'Failed to initialize application data.',
+                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                   textAlign: TextAlign.center,
+                 ),
+                 SizedBox(height: 8),
+                 Text('Please check your configuration or internet connection and restart.',
+                   textAlign: TextAlign.center,
+                 ),
+               ],
+             )
+          )
+        )
+      )
+    );
+  }
 }
 
 class NanheNestApp extends StatelessWidget {
