@@ -116,6 +116,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.animation),
+            onPressed: () =>
+                Navigator.pushNamed(context, '/animation-demo'),
+            tooltip: 'Animations Demo',
+          ),
+          IconButton(
             icon: const Icon(Icons.analytics),
             onPressed: () =>
                 Navigator.pushNamed(context, '/state-management-demo'),
