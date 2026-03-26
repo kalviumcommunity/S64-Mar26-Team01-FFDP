@@ -22,6 +22,17 @@ class DefaultFirebaseOptions {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
+      case TargetPlatform.iOS:
+        return ios;
+      case TargetPlatform.macOS:
+        return macos;
+      case TargetPlatform.windows:
+        return windows;
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -46,5 +57,33 @@ class DefaultFirebaseOptions {
     messagingSenderId: 'PASTE_YOUR_ANDROID_MESSAGING_SENDER_ID_HERE',
     projectId: 'your-nanhenest-project-id',
     storageBucket: 'your-nanhenest-project-id.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'PASTE_YOUR_IOS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_IOS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_IOS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    iosBundleId: 'com.example.nanhenest',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'PASTE_YOUR_MACOS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_MACOS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_MACOS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    iosBundleId: 'com.example.nanhenest.RunnerTests',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'PASTE_YOUR_WINDOWS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_WINDOWS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_WINDOWS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    authDomain: 'your-nanhenest-project-id.firebaseapp.com',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    measurementId: 'PASTE_YOUR_WINDOWS_MEASUREMENT_ID_HERE',
   );
 }
