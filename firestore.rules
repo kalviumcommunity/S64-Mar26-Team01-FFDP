@@ -24,6 +24,11 @@ service cloud.firestore {
     match /users/{uid} {
       allow read:  if isAuthenticated();
       allow write: if isOwner(uid);
+
+      // items subcollection — full CRUD, owner only (Assignment 3.42)
+      match /items/{itemId} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
     // ── posts/{postId} ──────────────────────────────────────────────────────

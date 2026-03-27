@@ -164,6 +164,14 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.firestoreQueryDemo),
                     ),
+                    _NavCard(
+                      icon: Icons.checklist_rtl,
+                      label: 'My Items (CRUD)',
+                      description: 'Create, read, update, delete',
+                      color: Colors.pink,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.crudDemo),
+                    ),
                   ],
                 ),
               ),
