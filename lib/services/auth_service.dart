@@ -117,6 +117,35 @@ class AuthService {
     }
   }
 
+  /// Auth-gated profile update — demonstrates the security pattern required
+  /// by Firestore rules: request.auth.uid == uid.
+  ///
+  /// This will throw a [FirebaseException] with PERMISSION_DENIED if:
+  ///   - The user is not signed in, or
+  ///   - The uid does not match the signed-in user's UID.
+  Future<void> updateUserProfile({
+    required String uid,
+    String? displayName,
+    String? bio,
+  }) async {
+    // Guard: must be authenticated and operating on own document
+    final currentUid = _firebaseAuth.currentUser?.uid;
+    if (currentUid == null) throw Exception('Not authenticated');
+    if (currentUid != uid) throw Exception('Permission denied');
+
+    final updates = <String, dynamic>{
+      'lastActive': Timestamp.now(),
+    };
+    if (displayName != null) updates['displayName'] = displayName;
+    if (bio != null) updates['bio'] = bio;
+
+    try {
+      await _firebaseFirestore.collection('users').doc(uid).update(updates);
+    } on FirebaseException catch (e) {
+      throw Exception('Firestore error: ${e.message}');
+    }
+  }
+
   /// Handle Firebase Auth exceptions and return a user-friendly Exception
   Exception _handleAuthException(FirebaseAuthException e) {
     final message = switch (e.code) {

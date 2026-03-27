@@ -1754,7 +1754,87 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Firestore Queries, Filters & Ordering (Assignments 3.34 & 3.35)
+## Sprint-2: Securing Firebase with Auth & Firestore Rules (Assignment 3.39)
+
+### Security Rules (`firestore.rules`)
+
+All collections are locked down — unauthenticated requests are denied by default.
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Only owner can write their own profile
+    match /users/{uid} {
+      allow read:  if isAuthenticated();
+      allow write: if isOwner(uid);
+    }
+
+    // Posts: any auth user reads/creates, only author updates/deletes
+    match /posts/{postId} {
+      allow read:          if isAuthenticated();
+      allow create:        if isAuthenticated()
+                           && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAuthenticated()
+                           && resource.data.uid == request.auth.uid;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+### Auth-Gated Firestore Access (Flutter)
+
+```dart
+// AuthService.updateUserProfile() — client-side guard mirrors the rule
+final currentUid = FirebaseAuth.instance.currentUser?.uid;
+if (currentUid == null) throw Exception('Not authenticated');
+if (currentUid != uid)  throw Exception('Permission denied');
+
+await FirebaseFirestore.instance
+    .collection('users')
+    .doc(uid)
+    .update({'displayName': displayName});
+// If rules deny → FirebaseException(PERMISSION_DENIED) is thrown
+```
+
+### Deploy Rules
+
+```bash
+firebase deploy --only firestore:rules
+firebase deploy --only firestore:indexes
+```
+
+### Common Issues
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `PERMISSION_DENIED` | Rules block access | Check rules + ensure user is signed in |
+| Writes fail | No login performed | Call `signIn()` before any Firestore write |
+| Open rules in prod | Started in test mode | Replace `if true` with auth checks |
+
+### Reflection
+
+**Why securing Firestore matters** — test mode (`allow read, write: if true`) exposes all data to anyone with the project ID. Production rules ensure only authenticated owners can modify their data.
+
+**How rules + client guards work together** — Firestore rules are the authoritative enforcement layer (server-side). Client-side checks in `AuthService` provide early feedback before the network call, improving UX.
+
+**PERMISSION_DENIED handling** — caught as `FirebaseException` in try/catch blocks, surfaced to the user via SnackBar with a clear message.
+
+---
 
 This section documents structured Firestore queries with `where`, `orderBy`, and `limit`.
 
