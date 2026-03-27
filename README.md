@@ -1754,7 +1754,67 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Persistent Login State – Auto-Login (Assignment 3.30)
+## Sprint-2: Firestore Database Schema Design (Assignment 3.31)
+
+This section documents the Cloud Firestore data model for NanheNest.
+
+### Data Requirements
+
+| # | Data | Collection |
+|---|------|------------|
+| 1 | User profiles | `users/` |
+| 2 | Posts / feed | `posts/` |
+| 3 | Post comments | `posts/{id}/comments/` |
+| 4 | Post likes | `posts/{id}/likes/` |
+| 5 | Community events | `events/` |
+
+### Schema Overview
+
+```
+Firestore Root
+├── users/{uid}
+│   ├── email, displayName, avatarUrl, bio
+│   ├── postCount, followerCount, followingCount
+│   ├── fcmToken, createdAt, lastActive
+│
+├── posts/{postId}
+│   ├── uid, displayName (denormalized), content, imageUrl
+│   ├── likes (counter), comments (counter)
+│   ├── createdAt, updatedAt
+│   ├── comments/{commentId}
+│   │   └── uid, displayName, text, createdAt
+│   └── likes/{uid}
+│       └── createdAt
+│
+└── events/{eventId}
+    ├── creatorUid, title, description
+    ├── location (GeoPoint), address
+    ├── eventDateTime, imageUrl
+    ├── attendees (array<string>), isActive
+    └── createdAt
+```
+
+Full schema with sample documents and diagram: [`docs/firestore_schema.md`](docs/firestore_schema.md)
+
+### Key Design Decisions
+
+- `posts/` is top-level (not under `users/`) so the global feed can be queried in a single call
+- `comments/` and `likes/` are subcollections — they can grow large and shouldn't be loaded with the feed card
+- `likes/{uid}` uses the liker's UID as the document ID — naturally prevents duplicate likes
+- `displayName` is denormalized onto posts to avoid extra reads when rendering the feed
+
+### Reflection
+
+**Why this structure?**
+It mirrors how the data is actually accessed — feed queries need all posts, not per-user. Subcollections for comments/likes keep the post document small and fast to load.
+
+**How does this help performance?**
+Firestore charges per document read. Keeping the post document lean (no embedded comment arrays) means the feed loads quickly and cheaply. Subcollections are only fetched when the user opens a specific post.
+
+**Challenges?**
+The main tradeoff was deciding between `attendees` as an array vs a subcollection for events. An array is simpler at current scale; a subcollection would be needed if events grow to thousands of attendees.
+
+---
 
 This section documents persistent user session handling using Firebase Auth's built-in token persistence.
 
