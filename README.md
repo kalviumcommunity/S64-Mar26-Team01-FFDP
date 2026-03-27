@@ -1754,7 +1754,99 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Firebase Authentication (Email & Password)
+## Sprint-2: Signup, Login & Logout Flows (Assignment 3.29)
+
+This section documents the complete authentication flow — signup, login, and logout — with seamless screen transitions driven by `authStateChanges()`.
+
+### How It Works
+
+```
+App Launch
+    │
+    ▼
+AuthGate — StreamBuilder<User?>(stream: authStateChanges())
+    │
+    ├── ConnectionState.waiting  → Loading spinner
+    ├── snapshot.hasData (User)  → HomeScreen  (logged in)
+    └── snapshot.data == null    → AuthScreen  (logged out)
+```
+
+No manual `Navigator.push` needed. Firebase's auth stream drives all navigation automatically.
+
+### Sign Up Logic
+
+```dart
+// AuthScreen calls AuthService.signUp()
+await _authService.signUp(
+  email: _emailController.text.trim(),
+  password: _passwordController.text,
+  displayName: _nameController.text.trim(),
+);
+// authStateChanges() emits User → AuthGate rebuilds → HomeScreen shown
+```
+
+### Login Logic
+
+```dart
+// AuthScreen calls AuthService.signIn()
+await _authService.signIn(
+  email: _emailController.text.trim(),
+  password: _passwordController.text,
+);
+// authStateChanges() emits User → AuthGate rebuilds → HomeScreen shown
+```
+
+### Logout Logic
+
+```dart
+// HomeScreen logout button calls AuthService.signOut()
+await AuthService().signOut();
+// authStateChanges() emits null → AuthGate rebuilds → AuthScreen shown
+```
+
+### authStateChanges() — Why It Matters
+
+`FirebaseAuth.instance.authStateChanges()` returns a `Stream<User?>` that emits:
+- A `User` object when a session is active (login/signup)
+- `null` when the session ends (logout or app restart with no session)
+
+Wrapping the root widget in a `StreamBuilder` on this stream means the app reacts to auth changes instantly — no manual routing, no flicker.
+
+```dart
+// lib/main.dart — AuthGate
+StreamBuilder<User?>(
+  stream: AuthService().authStateChanges(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (snapshot.hasData) return const HomeScreen();
+    return const AuthScreen();
+  },
+)
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/main.dart` | `AuthGate` — StreamBuilder routing |
+| `lib/screens/auth/auth_screen.dart` | Combined login/signup toggle screen |
+| `lib/screens/home/home_screen.dart` | Post-login screen with logout button |
+| `lib/services/auth_service.dart` | `signIn`, `signUp`, `signOut`, `authStateChanges()` |
+
+### Reflection
+
+**Hardest part of building the flow?**
+Ensuring the `ConnectionState.waiting` case was handled so the app doesn't flash the login screen for a split second on restart when a session already exists.
+
+**How does StreamBuilder simplify navigation?**
+It eliminates all manual `Navigator.push/pop` calls for auth transitions. The stream is the single source of truth — when auth state changes, the UI rebuilds automatically.
+
+**Why is logout essential for session security?**
+Without explicit logout, Firebase persists the session token indefinitely. Logout clears the token, ensuring the next user of the device can't access the previous user's account.
+
+---
 
 This section documents the implementation of **Firebase Authentication with Email & Password** as required by the Sprint-2 assignment.
 
