@@ -3,10 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'core/config/firebase_bootstrap.dart';
 import 'routes/app_routes.dart';
 import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'config/theme.dart';
+
+/// Global navigator key used by NotificationService to push routes
+/// from outside the widget tree (e.g. on notification tap).
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +25,37 @@ void main() async {
     runApp(const FirebaseErrorApp());
     return;
   }
+
+  // Initialize push notifications after Firebase is ready.
+  await NotificationService.instance.initialize(
+    onNotificationTap: (payload) {
+      // Route the user to the appropriate screen based on notification type.
+      final navigator = navigatorKey.currentState;
+      if (navigator == null) return;
+
+      switch (payload.type) {
+        case 'like':
+        case 'comment':
+          if (payload.postId != null) {
+            navigator.pushNamed(
+              AppRoutes.dashboard,
+              arguments: payload.postId,
+            );
+          }
+          break;
+        case 'message':
+          if (payload.chatId != null) {
+            navigator.pushNamed(
+              AppRoutes.realtimeChatList,
+              arguments: payload.chatId,
+            );
+          }
+          break;
+        default:
+          debugPrint('ℹ️ Unhandled notification type: ${payload.type}');
+      }
+    },
+  );
 
   runApp(const NanheNestApp());
 }
@@ -67,6 +103,7 @@ class NanheNestApp extends StatelessWidget {
     return MaterialApp(
       title: 'NanheNest',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,

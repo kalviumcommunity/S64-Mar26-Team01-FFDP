@@ -2419,6 +2419,56 @@ Concept 3.37 expands the architectural capability by providing off-client automa
    - Automated separation of document target origins preventing accidental self-notification pingbacks (i.e. guarding instances where a user likes their own post or chats with themselves).
    - Ensured outputs are securely written into independent `notifications` collections strictly to bypass triggering infinite nested Firestore write loops.
 
+
+## Concept 3.38: Push Notifications via Firebase Cloud Messaging
+
+This section documents the implementation of **Concept 3.38**, integrating Firebase Cloud Messaging (FCM) for production-grade push notification support across all app states.
+
+### Overview
+
+Concept 3.38 delivers a complete push notification pipeline — from device token management through foreground/background/terminated-state handling to safe notification tap routing — encapsulated in a singleton `NotificationService`.
+
+### Key Implemented Features
+
+1. **`NotificationService` Singleton (`lib/services/notification_service.dart`)**
+   - Manages the full FCM lifecycle: initialization, permissions, token retrieval, message listeners, and tap handling.
+   - Idempotent — safe to call `initialize()` multiple times without duplicate listener registration.
+
+2. **Permission Handling**
+   - Requests notification permissions on both iOS and Android 13+ using `FirebaseMessaging.requestPermission()`.
+   - Gracefully handles denied/provisional states without crashing app startup.
+
+3. **Device Token Management**
+   - Retrieves FCM token at startup and listens for `onTokenRefresh` events.
+   - Token is exposed via `getToken()` and ready for Firestore backend sync.
+
+4. **Foreground Notification Rendering**
+   - Uses `flutter_local_notifications` to display heads-up banners when FCM messages arrive while the app is open.
+   - Dedicated Android high-importance notification channel (`connecthub_high_importance`).
+
+5. **Background & Terminated-State Handling**
+   - Top-level `@pragma('vm:entry-point')` background handler registered via `FirebaseMessaging.onBackgroundMessage()`.
+   - `getInitialMessage()` captures notifications that launched the app from a terminated state.
+
+6. **Notification Tap Routing**
+   - `NotificationPayload` model safely parses FCM data payloads with typed fields (`type`, `postId`, `chatId`, `senderId`).
+   - `main.dart` wires a global `navigatorKey` to route taps to the correct screen (`dashboard` for likes/comments, `realtimeChatList` for messages).
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/services/notification_service.dart` | Full FCM + local notification lifecycle |
+| `lib/main.dart` | Initialization site + tap routing via `navigatorKey` |
+
+### Dependencies
+
+```yaml
+firebase_messaging: ^14.7.0
+flutter_local_notifications: ^16.1.0
+```
+
+
 ---
 
 <div align="center">
