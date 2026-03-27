@@ -3,10 +3,12 @@ import '../screens/home/home_screen.dart';
 import '../screens/home/dashboard_screen.dart';
 import '../screens/home/realtime_feed_screen.dart';
 import '../screens/home/realtime_chat_list_screen.dart';
+import '../screens/home/create_post_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/auth_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/about/about_screen.dart';
 import '../screens/devtools_demo_screen.dart';
@@ -34,6 +36,8 @@ class AppRoutes {
   static const String realtimeFeed = '/realtime-feed';
   static const String realtimeChatList = '/realtime-chat-list';
   static const String profile = '/profile';
+  static const String editProfile = '/edit-profile';
+  static const String createPost = '/create-post';
   static const String settings = '/settings';
   static const String about = '/about';
   static const String devToolsDemo = '/devtools-demo';
@@ -57,10 +61,12 @@ class AppRoutes {
         realtimeFeed: (_) => const RealtimeFeedScreen(),
         realtimeChatList: (_) => const RealtimeChatListScreen(),
         profile: (_) => const ProfileScreen(),
+        editProfile: (_) => const EditProfileScreen(),
+        createPost: (_) => CreatePostScreen(),
         settings: (_) => const SettingsScreen(),
         about: (_) => const AboutScreen(),
         devToolsDemo: (_) => const DevToolsDemoScreen(),
-        stateManagementDemo: (_) => const StateManagementDemo(),
+        stateManagementDemo: (_) => StateManagementDemo(),
         animationDemo: (_) => const AnimationDemoScreen(),
         firestoreReadDemo: (_) => const FirestoreReadDemoScreen(),
         firestoreWriteDemo: (_) => const FirestoreWriteDemoScreen(),
