@@ -1754,6 +1754,151 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
+## Sprint-2: Firebase Authentication (Email & Password)
+
+This section documents the implementation of **Firebase Authentication with Email & Password** as required by the Sprint-2 assignment.
+
+### What Was Implemented
+
+Firebase Authentication with Email & Password is fully integrated into NanheNest. Users can register new accounts, log in securely, and the app automatically manages session state — all backed by Firebase's authentication infrastructure.
+
+### Authentication Flow Summary
+
+```
+App Launch
+    │
+    ▼
+FirebaseBootstrap.initialize()   ← Firebase initialized before runApp()
+    │
+    ▼
+AuthGate (StreamBuilder on authStateChanges)
+    │
+    ├── User signed in  → DashboardScreen
+    └── User signed out → LoginScreen ⇄ SignUpScreen
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lib/services/auth_service.dart` | All Firebase Auth operations |
+| `lib/screens/auth/auth_screen.dart` | Combined login/signup toggle screen |
+| `lib/screens/auth/login_screen.dart` | Dedicated login screen with validation |
+| `lib/screens/auth/signup_screen.dart` | Dedicated signup screen with validation |
+| `lib/screens/home/dashboard_screen.dart` | Post-login screen with logout |
+| `lib/core/config/firebase_bootstrap.dart` | Firebase initialization wrapper |
+| `lib/main.dart` | AuthGate — auth-state-driven routing |
+
+### Signup Logic
+
+```dart
+// lib/services/auth_service.dart
+Future<UserCredential> signUp({
+  required String email,
+  required String password,
+  required String displayName,
+}) async {
+  final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+
+  // Automatically create Firestore user document on signup
+  await _firebaseFirestore
+      .collection('users')
+      .doc(userCredential.user!.uid)
+      .set(UserModel(...).toMap());
+
+  return userCredential;
+}
+```
+
+### Login Logic
+
+```dart
+// lib/services/auth_service.dart
+Future<UserCredential> signIn({
+  required String email,
+  required String password,
+}) async {
+  return await _firebaseAuth.signInWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+}
+```
+
+### Auth State Listener (Session Persistence)
+
+```dart
+// lib/main.dart — AuthGate widget
+StreamBuilder<User?>(
+  stream: _authService.authStateChanges(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (snapshot.hasData) {
+      return const DashboardScreen(); // logged in
+    }
+    return LoginScreen(onSignUpTap: _toggleAuthScreen); // logged out
+  },
+)
+```
+
+### Logout
+
+```dart
+// lib/screens/home/dashboard_screen.dart
+await _authService.signOut();
+// AuthGate's StreamBuilder automatically navigates back to LoginScreen
+```
+
+### Error Handling
+
+Firebase Auth exceptions are mapped to user-friendly messages in `AuthService._handleAuthException()`:
+
+| Firebase Error Code | User-Facing Message |
+|---------------------|---------------------|
+| `weak-password` | The password provided is too weak. |
+| `email-already-in-use` | An account already exists for that email. |
+| `invalid-email` | The email address is not valid. |
+| `user-not-found` | No user found for that email. |
+| `wrong-password` | Wrong password provided. |
+| `invalid-credential` | Invalid email or password. |
+| `user-disabled` | The user account has been disabled. |
+
+### Firebase Console Verification
+
+After a successful signup or login:
+1. Open [Firebase Console](https://console.firebase.google.com)
+2. Navigate to **Authentication → Users**
+3. The registered user's email appears in the table with UID and creation date
+
+### Dependencies (pubspec.yaml)
+
+```yaml
+dependencies:
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.11.0
+  cloud_firestore: ^4.14.0
+```
+
+### Reflection
+
+**How does Firebase simplify authentication management?**
+Firebase handles token generation, session persistence, secure password hashing, and email verification out of the box. Without Firebase, you'd need to build and maintain a custom auth backend, manage JWT tokens, and handle security vulnerabilities yourself.
+
+**What security features make it better than custom auth systems?**
+Firebase Auth uses industry-standard OAuth 2.0 and OpenID Connect protocols, stores passwords with bcrypt hashing, provides automatic token refresh, and enforces rate limiting on login attempts — all without any configuration.
+
+**What challenges were faced?**
+The main challenge was ensuring the `FirebaseAuthException` error codes were properly mapped to user-friendly messages, and making sure the `AuthGate` `StreamBuilder` correctly handled the `ConnectionState.waiting` state to avoid flashing the login screen on app restart when a session already exists.
+
+---
+
+---
+
 <div align="center">
 
 Made by Team NanheNest — Sprint #2, March 2026
