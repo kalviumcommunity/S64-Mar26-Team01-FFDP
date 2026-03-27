@@ -2393,6 +2393,34 @@ Concept 3.36 implements a scalable and bug-free Firebase Storage layer that allo
 
 ---
 
+## Concept 3.37: Cloud Functions for Serverless Events
+
+This section documents the implementation of **Concept 3.37**, delivering a production-grade Cloud Functions backend to safely automate event-driven serverless logic within the application.
+
+### Overview
+
+Concept 3.37 expands the architectural capability by providing off-client automation, specifically designed to handle background notification generations securely without adding workload blocking onto the user experiences on mobile.
+
+### Key Implemented Features
+
+1. **Trigger Hooks Architecture (`functions/src/triggers/`)**
+   - Implemented discrete, decoupled triggers listening strictly on backend event creations targeting paths `likes/{likeId}`, `comments/{commentId}`, and `messages/{messageId}`.
+   - Built to immediately extract relevant context silently processing logic post-event.
+
+2. **Idempotency & Duplicate Guards (`createIdempotentNotification`)**
+   - Engineered scalable notification identifiers tying the resultant notification outputs to deterministic identifiers (`like_{likeId}`, `message_{messageId}`).
+   - Proactive Cloud Function `doc().get().exists` verification blocking redundant duplicate data overriding caused by inherent serverless retried execution environments.
+
+3. **Strong Typing Implementations (`functions/src/types/`)**
+   - Eliminated `any` vulnerabilities by implementing strict formatting definitions for `MessageDocument`, `CommentDocument`, `LikeDocument`, and `NotificationPayload`.
+   - Hardened parsing logic ensuring unknown anomalies are rejected quietly bypassing infinite loops.
+
+4. **Event Safety Guardrails**
+   - Automated separation of document target origins preventing accidental self-notification pingbacks (i.e. guarding instances where a user likes their own post or chats with themselves).
+   - Ensured outputs are securely written into independent `notifications` collections strictly to bypass triggering infinite nested Firestore write loops.
+
+---
+
 <div align="center">
 
 Made by Team NanheNest — Sprint #2, March 2026

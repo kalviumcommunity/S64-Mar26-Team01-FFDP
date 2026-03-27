@@ -1,4 +1,5 @@
 import { db } from '../config/firebase';
+import { NotificationPayload } from '../types';
 
 /**
  * Secures a notification write by using a deterministic ID.
@@ -6,7 +7,7 @@ import { db } from '../config/firebase';
  * @param notificationId Unique deterministic ID (e.g. `like_notification_${likeId}`)
  * @param payload The notification data
  */
-export async function createIdempotentNotification(notificationId: string, payload: any): Promise<void> {
+export async function createIdempotentNotification(notificationId: string, payload: NotificationPayload): Promise<void> {
   const notificationRef = db.collection('notifications').doc(notificationId);
   
   // Using set() with merge: true or just set() creates the document safely.

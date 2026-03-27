@@ -2,6 +2,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as logger from 'firebase-functions/logger';
 import { createIdempotentNotification } from '../utils/idempotency';
 import { db } from '../config/firebase';
+import { CommentDocument } from '../types';
 
 export const onNewComment = onDocumentCreated('comments/{commentId}', async (event) => {
   const snapshot = event.data;
@@ -10,7 +11,7 @@ export const onNewComment = onDocumentCreated('comments/{commentId}', async (eve
     return;
   }
 
-  const data = snapshot.data();
+  const data = snapshot.data() as CommentDocument;
   const actorId = data?.userId || data?.actorId;
   const postId = data?.postId;
   const text = data?.text || data?.content || '';
