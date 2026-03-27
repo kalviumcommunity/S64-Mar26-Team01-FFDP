@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 48,
-                backgroundColor: theme.colorScheme.primary.withOpacity(0.15),
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
                 child: Text(
                   (user?.displayName?.isNotEmpty == true
                           ? user!.displayName![0]
@@ -86,7 +86,7 @@ class ProfileScreen extends StatelessWidget {
               Text(
                 user?.email ?? 'No email',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -169,14 +169,14 @@ class _InfoTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+      color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: theme.colorScheme.primary),
         title: Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         subtitle: Text(value, style: theme.textTheme.bodyMedium),
