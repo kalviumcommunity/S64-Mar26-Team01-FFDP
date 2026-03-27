@@ -156,6 +156,14 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.firestoreWriteDemo),
                     ),
+                    _NavCard(
+                      icon: Icons.manage_search,
+                      label: 'Firestore Queries',
+                      description: 'Filter, sort & limit data',
+                      color: Colors.green,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.firestoreQueryDemo),
+                    ),
                   ],
                 ),
               ),
