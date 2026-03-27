@@ -148,6 +148,14 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.firestoreReadDemo),
                     ),
+                    _NavCard(
+                      icon: Icons.edit_note,
+                      label: 'Firestore Writes',
+                      description: 'Add, update & set operations',
+                      color: Colors.indigo,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.firestoreWriteDemo),
+                    ),
                   ],
                 ),
               ),
