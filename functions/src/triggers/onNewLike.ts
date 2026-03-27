@@ -2,6 +2,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as logger from 'firebase-functions/logger';
 import { createIdempotentNotification } from '../utils/idempotency';
 import { db } from '../config/firebase';
+import { LikeDocument } from '../types';
 
 export const onNewLike = onDocumentCreated('likes/{likeId}', async (event) => {
   const snapshot = event.data;
@@ -10,7 +11,7 @@ export const onNewLike = onDocumentCreated('likes/{likeId}', async (event) => {
     return;
   }
 
-  const data = snapshot.data();
+  const data = snapshot.data() as LikeDocument;
   const actorId = data?.userId || data?.actorId;
   const postId = data?.postId;
   
