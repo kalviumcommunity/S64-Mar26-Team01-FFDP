@@ -5,6 +5,7 @@ import 'routes/app_routes.dart';
 import 'services/auth_service.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,8 +87,13 @@ class NanheNestApp extends StatelessWidget {
   }
 }
 
-/// AuthGate listens to Firebase auth state and routes accordingly.
-/// No manual Navigator calls needed — the stream handles all transitions.
+/// AuthGate — listens to Firebase auth state for persistent session handling.
+///
+/// Flow:
+///   App opens → SplashScreen (while Firebase checks stored token)
+///   Token valid  → HomeScreen  (auto-login, no credentials needed)
+///   Token absent → AuthScreen  (user must sign in)
+///   User logs out → AuthScreen (session cleared)
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -96,16 +102,17 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: AuthService().authStateChanges(),
       builder: (context, snapshot) {
+        // Firebase is checking the persisted session token — show splash
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const SplashScreen();
         }
-        // Signed in → HomeScreen
+
+        // Valid session found → skip login, go straight to HomeScreen
         if (snapshot.hasData) {
           return const HomeScreen();
         }
-        // Signed out → AuthScreen (combined login/signup)
+
+        // No session / logged out → show AuthScreen
         return const AuthScreen();
       },
     );

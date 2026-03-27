@@ -1754,7 +1754,96 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Signup, Login & Logout Flows (Assignment 3.29)
+## Sprint-2: Persistent Login State – Auto-Login (Assignment 3.30)
+
+This section documents persistent user session handling using Firebase Auth's built-in token persistence.
+
+### How Firebase Session Persistence Works
+
+Firebase Auth automatically stores a secure token on the device after login. On every app restart, it checks this token silently in the background. As a developer, you only need to react to the stream — no `SharedPreferences` or manual token storage required.
+
+```
+App opens
+    │
+    ▼
+Firebase checks stored token  ← SplashScreen shown during this
+    │
+    ├── Token valid   → HomeScreen  (auto-login, no credentials needed)
+    ├── Token absent  → AuthScreen  (user must sign in)
+    └── Token expired → AuthScreen  (Firebase invalidates automatically)
+```
+
+### AuthGate with SplashScreen
+
+```dart
+// lib/main.dart
+StreamBuilder<User?>(
+  stream: AuthService().authStateChanges(),
+  builder: (context, snapshot) {
+    // Firebase checking persisted token → show branded splash
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const SplashScreen();
+    }
+    // Valid session → skip login entirely
+    if (snapshot.hasData) {
+      return const HomeScreen();
+    }
+    // No session → login required
+    return const AuthScreen();
+  },
+)
+```
+
+### SplashScreen (`lib/screens/splash_screen.dart`)
+
+Shown while Firebase verifies the stored session token. Replaces the bare `CircularProgressIndicator` with a branded loading experience.
+
+### Auto-Login Flow
+
+1. User logs in → Firebase stores token on device
+2. User closes app
+3. User reopens app → `authStateChanges()` emits the stored `User`
+4. `AuthGate` rebuilds → `HomeScreen` shown immediately, no login prompt
+
+### Logout Flow
+
+```dart
+await AuthService().signOut();
+// Firebase clears the stored token
+// authStateChanges() emits null
+// AuthGate rebuilds → AuthScreen shown
+```
+
+### Token Lifecycle
+
+| Event | Token State | App Behaviour |
+|-------|-------------|---------------|
+| Login / Signup | Stored on device | HomeScreen |
+| App restart | Auto-refreshed by Firebase | HomeScreen (auto-login) |
+| Logout | Cleared | AuthScreen |
+| Password changed elsewhere | Invalidated | AuthScreen |
+| App data cleared | Removed | AuthScreen |
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/main.dart` | `AuthGate` with `SplashScreen` during waiting state |
+| `lib/screens/splash_screen.dart` | Branded loading screen shown on app start |
+| `lib/services/auth_service.dart` | `authStateChanges()` stream wrapper |
+
+### Reflection
+
+**Why is persistent login essential?**
+Requiring users to log in every time they open an app is a major UX friction point. Persistent sessions keep users engaged and mirror the behaviour they expect from every modern app.
+
+**How does Firebase make session handling easy?**
+Firebase handles token storage, refresh, and invalidation entirely. The developer only needs one `StreamBuilder` — no manual token management, no `SharedPreferences`, no expiry logic.
+
+**Issues faced while testing auto-login?**
+The main gotcha is the `ConnectionState.waiting` flash — without a `SplashScreen`, the app briefly shows the login screen before the token check completes, even when the user is already logged in. The `SplashScreen` eliminates this flicker entirely.
+
+---
 
 This section documents the complete authentication flow — signup, login, and logout — with seamless screen transitions driven by `authStateChanges()`.
 
