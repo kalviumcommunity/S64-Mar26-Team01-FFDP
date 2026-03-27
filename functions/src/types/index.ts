@@ -31,9 +31,12 @@ export interface CommentDocument {
 
 export interface MessageDocument {
   senderId?: string;
+  userId?: string; // App-side alternate for senderId depending on schema
   recipientId?: string;
+  targetId?: string; // Alternate for recipientId
   text?: string;
   content?: string;
   chatId?: string;
+  conversationId?: string; // Alternate for chatId
   createdAt?: admin.firestore.Timestamp;
 }

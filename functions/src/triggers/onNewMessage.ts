@@ -1,6 +1,7 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as logger from 'firebase-functions/logger';
 import { createIdempotentNotification } from '../utils/idempotency';
+import { MessageDocument } from '../types';
 
 export const onNewMessage = onDocumentCreated('messages/{messageId}', async (event) => {
   const snapshot = event.data;
@@ -9,7 +10,7 @@ export const onNewMessage = onDocumentCreated('messages/{messageId}', async (eve
     return;
   }
 
-  const data = snapshot.data();
+  const data = snapshot.data() as MessageDocument;
   const senderId = data?.senderId || data?.userId;
   // Support both recipientId or a targetId depending on schema
   const targetId = data?.recipientId || data?.targetId;
