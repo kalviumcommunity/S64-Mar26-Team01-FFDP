@@ -1800,6 +1800,57 @@ match /users/{uid}/items/{itemId} {
 edit dialog for update, delete confirmation. Access via "My Items (CRUD)" on HomeScreen.
 
 ---
+
+---
+
+## Sprint-2: Riverpod State Management (Assignment 3.43)
+
+### Providers Created (`lib/providers/app_providers.dart`)
+
+| Provider | Type | Purpose |
+|----------|------|---------|
+| `authStateProvider` | `StreamProvider<User?>` | Firebase auth state — any widget reacts to login/logout |
+| `counterProvider` | `StateProvider<int>` | Shared counter across screens |
+| `favoritesProvider` | `StateNotifierProvider<List<String>>` | Favorites list with add/remove/toggle |
+| `darkModeProvider` | `StateProvider<bool>` | Theme preference |
+
+### Setup
+
+```dart
+// main.dart — wrap app with ProviderScope
+runApp(const ProviderScope(child: NanheNestApp()));
+```
+
+### Read & Update
+
+```dart
+// StateProvider — read
+final count = ref.watch(counterProvider);
+
+// StateProvider — update
+ref.read(counterProvider.notifier).state++;
+
+// StateNotifierProvider — read
+final favorites = ref.watch(favoritesProvider);
+
+// StateNotifierProvider — update
+ref.read(favoritesProvider.notifier).toggle('Flutter');
+
+// StreamProvider — async value
+final authAsync = ref.watch(authStateProvider);
+authAsync.when(data: (user) => ..., loading: () => ..., error: (e,_) => ...);
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/providers/app_providers.dart` | All Riverpod providers |
+| `lib/screens/riverpod_demo_screen.dart` | 3-tab demo: counter, favorites, auth state |
+
+Access via "Riverpod State" card on HomeScreen.
+
+---
 ## License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.

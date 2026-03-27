@@ -7,6 +7,7 @@ import 'services/notification_service.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/theme.dart';
 
 /// Global navigator key used by NotificationService to push routes
@@ -57,7 +58,7 @@ void main() async {
     },
   );
 
-  runApp(const NanheNestApp());
+  runApp(const ProviderScope(child: NanheNestApp()));
 }
 
 class FirebaseErrorApp extends StatelessWidget {
