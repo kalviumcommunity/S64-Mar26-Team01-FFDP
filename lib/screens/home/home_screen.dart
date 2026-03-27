@@ -172,6 +172,14 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.crudDemo),
                     ),
+                    _NavCard(
+                      icon: Icons.hub_outlined,
+                      label: 'Riverpod State',
+                      description: 'Shared state across screens',
+                      color: Colors.cyan,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.riverpodDemo),
+                    ),
                   ],
                 ),
               ),
