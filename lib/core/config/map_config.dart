@@ -36,11 +36,10 @@ class MapConfig {
   static const bool compassEnabled = true;
 
   /// Whether the "my location" blue-dot button is visible.
-  /// Kept false until the app requests location permission.
-  static const bool myLocationButtonEnabled = false;
+  static const bool myLocationButtonEnabled = true;
 
   /// Whether the user's location blue dot is rendered.
-  static const bool myLocationEnabled = false;
+  static const bool myLocationEnabled = true;
 
   /// Whether the default Google Maps toolbar appears on marker taps.
   static const bool mapToolbarEnabled = false;
@@ -55,4 +54,11 @@ class MapConfig {
   /// Combined min/max as [MinMaxZoomPreference] for the widget.
   static const MinMaxZoomPreference zoomPreference =
       MinMaxZoomPreference(minZoom, maxZoom);
+
+  // ── Location Defaults ─────────────────────────────────────────────
+  /// Zoom level used when centring on the user's location.
+  static const double userLocationZoom = 16.0;
+
+  /// How long to wait for a GPS fix before giving up.
+  static const Duration locationFetchTimeout = Duration(seconds: 10);
 }

@@ -17,6 +17,7 @@ import '../screens/animations/animation_demo_screen.dart';
 import '../screens/firestore_read_demo_screen.dart';
 import '../screens/firestore_write_demo_screen.dart';
 import '../screens/firestore_query_demo_screen.dart';
+import '../screens/maps/map_screen.dart';
 
 /// Centralized named route definitions for NanheNest.
 ///
@@ -46,6 +47,7 @@ class AppRoutes {
   static const String firestoreReadDemo = '/firestore-read-demo';
   static const String firestoreWriteDemo = '/firestore-write-demo';
   static const String firestoreQueryDemo = '/firestore-query-demo';
+  static const String map = '/map';
 
   /// All named routes registered in MaterialApp
   static Map<String, WidgetBuilder> get routes => {
@@ -71,5 +73,6 @@ class AppRoutes {
         firestoreReadDemo: (_) => const FirestoreReadDemoScreen(),
         firestoreWriteDemo: (_) => const FirestoreWriteDemoScreen(),
         firestoreQueryDemo: (_) => const FirestoreQueryDemoScreen(),
+        map: (_) => const MapScreen(),
       };
 }
