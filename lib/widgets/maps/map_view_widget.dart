@@ -8,6 +8,10 @@ import '../../core/config/map_config.dart';
 /// Accepts optional overrides for initial position, map type, markers, and
 /// the onMapCreated callback.  Defaults come from [MapConfig].
 ///
+/// The [myLocationEnabled] and [myLocationButtonEnabled] flags are exposed as
+/// constructor parameters so the parent can toggle them dynamically based on
+/// permission state (avoiding exceptions when permission is not yet granted).
+///
 /// Wrap this widget in a parent that provides bounded constraints (e.g.
 /// [Expanded], [SizedBox], or [Scaffold.body]) to avoid layout issues.
 class MapViewWidget extends StatelessWidget {
@@ -35,6 +39,14 @@ class MapViewWidget extends StatelessWidget {
   /// Called when the camera finishes an idle state.
   final void Function()? onCameraIdle;
 
+  /// Whether to show the user's location blue dot.
+  /// Defaults to [MapConfig.myLocationEnabled].
+  final bool myLocationEnabled;
+
+  /// Whether the my-location FAB is visible.
+  /// Defaults to [MapConfig.myLocationButtonEnabled].
+  final bool myLocationButtonEnabled;
+
   const MapViewWidget({
     super.key,
     this.initialCameraPosition = MapConfig.defaultCameraPosition,
@@ -45,6 +57,8 @@ class MapViewWidget extends StatelessWidget {
     this.onTap,
     this.onCameraMoveStarted,
     this.onCameraIdle,
+    this.myLocationEnabled = MapConfig.myLocationEnabled,
+    this.myLocationButtonEnabled = MapConfig.myLocationButtonEnabled,
   });
 
   @override
@@ -64,11 +78,11 @@ class MapViewWidget extends StatelessWidget {
         onCameraMoveStarted: onCameraMoveStarted,
         onCameraIdle: onCameraIdle,
 
-        // UI controls (from MapConfig)
+        // UI controls (from MapConfig, overridable via constructor)
         zoomControlsEnabled: MapConfig.zoomControlsEnabled,
         compassEnabled: MapConfig.compassEnabled,
-        myLocationButtonEnabled: MapConfig.myLocationButtonEnabled,
-        myLocationEnabled: MapConfig.myLocationEnabled,
+        myLocationButtonEnabled: myLocationButtonEnabled,
+        myLocationEnabled: myLocationEnabled,
         mapToolbarEnabled: MapConfig.mapToolbarEnabled,
         minMaxZoomPreference: MapConfig.zoomPreference,
       ),
