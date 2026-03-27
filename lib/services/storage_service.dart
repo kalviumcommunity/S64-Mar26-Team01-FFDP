@@ -430,7 +430,8 @@ class StorageService {
 
   /// Get file extension from path (lowercase, without dot).
   static String _getExtension(String filePath) {
-    final parts = filePath.toLowerCase().split('.');
+    final fileName = filePath.contains('/') ? filePath.split('/').last : filePath.split('\\').last;
+    final parts = fileName.toLowerCase().split('.');
     return parts.length > 1 ? parts.last : '';
   }
 

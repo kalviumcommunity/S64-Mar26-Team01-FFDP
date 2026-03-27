@@ -2348,6 +2348,49 @@ The main challenge was ensuring the `FirebaseAuthException` error codes were pro
 
 ---
 
+## Concept 3.36: Firebase Storage — Upload & Manage Media
+
+This section documents the implementation of **Concept 3.36**, which focuses on integrating Firebase Storage for robust media upload and management in NanheNest.
+
+### Overview
+
+Concept 3.36 implements a scalable and bug-free Firebase Storage layer that allows users to seamlessly upload avatars, posts, and chat media.
+
+### Key Implemented Features
+
+1. **Storage Layer Built (`StorageService`)**
+   - Implemented a clean, strongly typed `StorageService` using the singleton pattern.
+   - Segregated upload methods: `uploadUserAvatar()`, `uploadPostImage()`, `uploadEventImage()`, and `uploadChatMedia()`.
+   - Mapped Firebase Storage error codes to a typed enum `StorageExceptionType` for UI feedback.
+   - Built-in cancellation support via `UploadTask.cancel()`.
+   - Real-time progress tracking `onProgress(double)`.
+   - Automated path extensions scaling (e.g. `avatars/{userId}/profile.jpg`, `posts/{postId}/{timestamp}.{ext}`).
+
+2. **Media Picker Integration (`MediaPickerUtil`)**
+   - Safe abstraction over the `image_picker` package supporting both Camera and Gallery images.
+   - Guaranteed null-safe file picking gracefully handling user cancellation.
+
+3. **Client-Side Validation & Compression**
+   - Explicit file existence and extension (`jpg`, `png`, `webp`, `heic`, etc.) verification.
+   - Size limit bound assertions prior to attempting any network operation.
+   - Automated `flutter_image_compress` integration converting large native photos into bandwidth-friendly versions (< 500KB) transparently.
+
+4. **UI Integration (`CreatePostScreen` & `EditProfileScreen`)**
+   - Visual upload progress bar overlays mapped flawlessly to the Storage Stream events.
+   - Error handling rendering localized inline errors without crashing.
+   - Complete logical decouple between the core Firebase components and widgets.
+   - Fallback rendering UI correctly switching between offline file previews and Network Cached Images.
+
+### Bug Fixes Implemented
+
+- **Path Extension Edge-Case Resolution**: Solved a critical latent bug occurring on dynamic OS environments where directory names cache paths holding dot notations (`.`) resulted in the file extension validator failing erroneously. Evaluated the proper path substring strategy ensuring robust hardware support. 
+
+### Learning Outcomes
+
+1. **Upload Reliability**: Managing asynchronous streaming connections under varied network topologies.
+2. **Bandwidth Optimization**: The pivotal role of local Client-Side Image Preprocessing.
+3. **Decoupled Scoping**: Separation of Concerns structuring `Service` completely independent of `Widget`.
+
 ---
 
 <div align="center">

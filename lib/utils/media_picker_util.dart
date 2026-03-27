@@ -119,7 +119,8 @@ class MediaPickerUtil {
 
     // Check file extension
     final path = file.path.toLowerCase();
-    final extension = path.split('.').last;
+    final fileName = path.contains('/') ? path.split('/').last : path.split('\\').last;
+    final extension = fileName.contains('.') ? fileName.split('.').last : '';
 
     if (!supportedImageExtensions.contains(extension)) {
       return (false, 'Format .$extension not supported. Use: ${supportedImageExtensions.join(", ")}');
@@ -135,7 +136,8 @@ class MediaPickerUtil {
 
   /// Get file extension from path (lowercase, without dot).
   static String getExtension(String filePath) {
-    final parts = filePath.toLowerCase().split('.');
+    final fileName = filePath.contains('/') ? filePath.split('/').last : filePath.split('\\').last;
+    final parts = fileName.toLowerCase().split('.');
     return parts.length > 1 ? parts.last : '';
   }
 
