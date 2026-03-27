@@ -1754,7 +1754,65 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Writing & Updating Data to Firestore (Assignment 3.33)
+## Sprint-2: Firestore Queries, Filters & Ordering (Assignment 3.34)
+
+This section documents structured Firestore queries with `where`, `orderBy`, and `limit`.
+
+### Query Types Implemented
+
+| Query | Code | Purpose |
+|-------|------|---------|
+| Equality filter | `.where('isCompleted', isEqualTo: false)` | Show only incomplete tasks |
+| Order ascending | `.orderBy('title')` | Alphabetical sort |
+| Order descending | `.orderBy('createdAt', descending: true)` | Newest first |
+| Limit | `.limit(10)` | Cap results for performance |
+| Composite | `where + orderBy + limit` | Filtered + sorted + capped |
+
+### Code Snippets
+
+```dart
+// Equality filter + orderBy + limit (composite query)
+FirebaseFirestore.instance
+    .collection('tasks')
+    .where('isCompleted', isEqualTo: false)
+    .orderBy('createdAt', descending: true)
+    .limit(10)
+    .snapshots()
+
+// Sort by title ascending
+FirebaseFirestore.instance
+    .collection('tasks')
+    .orderBy('title')
+    .snapshots()
+
+// Comparison filter
+FirebaseFirestore.instance
+    .collection('tasks')
+    .where('likes', isGreaterThan: 0)
+    .snapshots()
+```
+
+### Dynamic Query Builder
+
+`FirestoreQueryDemoScreen` lets you toggle filters and sort options at runtime — the `StreamBuilder` rebuilds instantly as the query changes. Includes a "Seed Tasks" FAB to populate sample data.
+
+### Index Note
+
+Combining `where()` on one field with `orderBy()` on a different field requires a **composite index** in Firebase Console → Firestore → Indexes. The screen shows a clear error message if an index is missing.
+
+### Key File
+
+`lib/screens/firestore_query_demo_screen.dart` — interactive query builder with live results.
+
+### Reflection
+
+**Why sorting/filtering improves UX** — fetching all documents and filtering in Dart wastes bandwidth and memory. Server-side queries return only what's needed, making the app faster and cheaper to run.
+
+**Query types used** — equality (`isEqualTo`), ordering (`orderBy` asc/desc), and result capping (`limit`). Composite queries combine all three.
+
+**Index errors** — `where` + `orderBy` on different fields requires a composite index. Firebase provides a direct link in the error message to create it in one click.
+
+---
 
 This section documents all three Firestore write operations implemented in NanheNest.
 
