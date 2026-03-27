@@ -1748,6 +1748,58 @@ Navigator.of(context).popUntil((route) => route.isFirst);
 
 ---
 
+
+---
+
+## Sprint-2: Full CRUD Flow — UI + Firestore + Auth (Assignment 3.42)
+
+Complete Create, Read, Update, Delete using `users/{uid}/items/{itemId}` subcollection.
+
+### Data Path
+
+```
+users/{uid}/items/{itemId}
+├── title       : string
+├── description : string
+├── createdAt   : number (millisecondsSinceEpoch)
+└── updatedAt   : number (on edit)
+```
+
+### CRUD Operations
+
+```dart
+final items = FirebaseFirestore.instance
+    .collection('users').doc(uid).collection('items');
+
+// C — Create
+await items.add({'title': t, 'description': d,
+    'createdAt': DateTime.now().millisecondsSinceEpoch});
+
+// R — Real-time read
+items.orderBy('createdAt', descending: true).snapshots()
+
+// U — Update
+await items.doc(id).update({'title': newTitle,
+    'updatedAt': DateTime.now().millisecondsSinceEpoch});
+
+// D — Delete
+await items.doc(id).delete();
+```
+
+### Firestore Rule
+
+```javascript
+match /users/{uid}/items/{itemId} {
+  allow read, write: if request.auth.uid == uid;
+}
+```
+
+### Key File
+
+`lib/screens/crud_demo_screen.dart` — FAB to create, `StreamBuilder` for live list,
+edit dialog for update, delete confirmation. Access via "My Items (CRUD)" on HomeScreen.
+
+---
 ## License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
