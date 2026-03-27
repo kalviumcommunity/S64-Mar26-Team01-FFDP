@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../models/post_model.dart';
 
 /// Service class for Firestore database operations
 class FirestoreService {
@@ -89,21 +90,39 @@ class FirestoreService {
     }
   }
 
-  /// Get all posts as a stream
-  Stream<List<Map<String, dynamic>>> getPostsStream() {
+  /// Get all posts as a stream with enhanced error handling
+  Stream<List<PostModel>> getPostsStream() {
     return _firestore
         .collection('posts')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => {...doc.data(), 'id': doc.id})
+          .map((doc) {
+            try {
+              // Safely handle potentially malformed documents
+              return PostModel.fromFirestore(doc);
+            } catch (e) {
+              // We can't return null here, so we create a placeholder post
+              return PostModel(
+                postId: doc.id,
+                uid: 'error',
+                displayName: 'Error Loading Post',
+                content: 'This post could not be loaded due to a data error.',
+                likes: 0,
+                comments: 0,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                tags: [],
+              );
+            }
+          })
           .toList();
     });
   }
 
-  /// Get posts by user
-  Stream<List<Map<String, dynamic>>> getUserPostsStream(String uid) {
+  /// Get posts by user with enhanced error handling
+  Stream<List<PostModel>> getUserPostsStream(String uid) {
     return _firestore
         .collection('posts')
         .where('uid', isEqualTo: uid)
@@ -111,7 +130,25 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => {...doc.data(), 'id': doc.id})
+          .map((doc) {
+            try {
+              // Safely handle potentially malformed documents
+              return PostModel.fromFirestore(doc);
+            } catch (e) {
+              // We can't return null here, so we create a placeholder post
+              return PostModel(
+                postId: doc.id,
+                uid: 'error',
+                displayName: 'Error Loading Post',
+                content: 'This post could not be loaded due to a data error.',
+                likes: 0,
+                comments: 0,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                tags: [],
+              );
+            }
+          })
           .toList();
     });
   }
@@ -160,6 +197,77 @@ class FirestoreService {
     } catch (e) {
       throw 'Failed to unlike post: $e';
     }
+  }
+
+  // ==================== Enhanced Real-Time Features ====================
+
+  /// Get real-time updates for a specific post
+  Stream<Map<String, dynamic>?> getPostStream(String postId) {
+    return _firestore.collection('posts').doc(postId).snapshots().map((doc) {
+      if (doc.exists) {
+        try {
+          return {...doc.data() as Map<String, dynamic>, 'id': doc.id};
+        } catch (e) {
+          return {
+            'id': doc.id,
+            'content': 'Unable to load post',
+            'error': true,
+          };
+        }
+      }
+      return null;
+    });
+  }
+
+  /// Get real-time updates for posts with specific tags
+  Stream<List<Map<String, dynamic>>> getTaggedPostsStream(String tag) {
+    return _firestore
+        .collection('posts')
+        .where('tags', arrayContains: tag)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) {
+            try {
+              final data = doc.data() as Map<String, dynamic>;
+              return {...data, 'id': doc.id};
+            } catch (e) {
+              return {
+                'id': doc.id,
+                'content': 'Unable to load post',
+                'error': true,
+              };
+            }
+          })
+          .toList();
+    });
+  }
+
+  /// Get real-time notifications for a user
+  Stream<List<Map<String, dynamic>>> getUserNotificationsStream(String uid) {
+    return _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: uid)
+        .orderBy('timestamp', descending: true)
+        .limit(20)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) {
+            try {
+              final data = doc.data() as Map<String, dynamic>;
+              return {...data, 'id': doc.id};
+            } catch (e) {
+              return {
+                'id': doc.id,
+                'content': 'Unable to load notification',
+                'error': true,
+              };
+            }
+          })
+          .toList();
+    });
   }
 
   // ==================== General Read Operations ====================
