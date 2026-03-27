@@ -1754,7 +1754,7 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Firestore Queries, Filters & Ordering (Assignment 3.34)
+## Sprint-2: Firestore Queries, Filters & Ordering (Assignments 3.34 & 3.35)
 
 This section documents structured Firestore queries with `where`, `orderBy`, and `limit`.
 
