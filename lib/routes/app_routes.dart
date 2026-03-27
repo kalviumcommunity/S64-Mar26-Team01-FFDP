@@ -3,12 +3,14 @@ import '../screens/home/home_screen.dart';
 import '../screens/home/dashboard_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
+import '../screens/auth/auth_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/about/about_screen.dart';
 import '../screens/devtools_demo_screen.dart';
 import '../screens/state_management_demo.dart';
 import '../screens/animations/animation_demo_screen.dart';
+
 /// Centralized named route definitions for NanheNest.
 ///
 /// Usage:
@@ -22,6 +24,7 @@ class AppRoutes {
   static const String home = '/';
   static const String login = '/login';
   static const String signup = '/signup';
+  static const String auth = '/auth';
   static const String dashboard = '/dashboard';
   static const String profile = '/profile';
   static const String settings = '/settings';
@@ -33,6 +36,7 @@ class AppRoutes {
   /// All named routes registered in MaterialApp
   static Map<String, WidgetBuilder> get routes => {
         home: (_) => const HomeScreen(),
+        auth: (_) => const AuthScreen(),
         login: (ctx) => LoginScreen(onSignUpTap: () {
               Navigator.pushReplacementNamed(ctx, signup);
             }),

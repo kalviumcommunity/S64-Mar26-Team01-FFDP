@@ -66,7 +66,7 @@ class AuthService {
     try {
       await _firebaseAuth.signOut();
     } catch (e) {
-      throw 'Failed to sign out: $e';
+      throw Exception('Failed to sign out: $e');
     }
   }
 
@@ -117,25 +117,19 @@ class AuthService {
     }
   }
 
-  /// Handle Firebase Auth exceptions
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'email-already-in-use':
-        return 'An account already exists for that email.';
-      case 'invalid-email':
-        return 'The email address is not valid.';
-      case 'user-disabled':
-        return 'The user account has been disabled.';
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided.';
-      case 'operation-not-allowed':
-        return 'Email/password accounts are not enabled.';
-      default:
-        return 'Authentication error: ${e.message}';
-    }
+  /// Handle Firebase Auth exceptions and return a user-friendly Exception
+  Exception _handleAuthException(FirebaseAuthException e) {
+    final message = switch (e.code) {
+      'weak-password' => 'The password provided is too weak.',
+      'email-already-in-use' => 'An account already exists for that email.',
+      'invalid-email' => 'The email address is not valid.',
+      'user-disabled' => 'The user account has been disabled.',
+      'user-not-found' => 'No user found for that email.',
+      'wrong-password' => 'Wrong password provided.',
+      'invalid-credential' => 'Invalid email or password.',
+      'operation-not-allowed' => 'Email/password accounts are not enabled.',
+      _ => 'Authentication error: ${e.message}',
+    };
+    return Exception(message);
   }
 }
