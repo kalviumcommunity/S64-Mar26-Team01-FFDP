@@ -1754,7 +1754,86 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Reading Data from Firestore (Assignment 3.32)
+## Sprint-2: Writing & Updating Data to Firestore (Assignment 3.33)
+
+This section documents all three Firestore write operations implemented in NanheNest.
+
+### Write Operations
+
+| Operation | Method | When to use |
+|-----------|--------|-------------|
+| Create | `.collection().add({})` | New document, auto-generated ID |
+| Set (upsert) | `.doc(id).set({}, SetOptions(merge: true))` | Write to known ID, preserve other fields |
+| Update | `.doc(id).update({})` | Modify specific fields only |
+
+### add() — Create New Document
+
+```dart
+await FirebaseFirestore.instance.collection('tasks').add({
+  'title': title,
+  'description': desc,
+  'isCompleted': false,
+  'uid': currentUser.uid,
+  'createdAt': Timestamp.now(),
+  'updatedAt': Timestamp.now(),
+});
+```
+
+### update() — Modify Specific Fields
+
+```dart
+// Toggle completion
+await FirebaseFirestore.instance
+    .collection('tasks')
+    .doc(docId)
+    .update({
+      'isCompleted': !current,
+      'updatedAt': Timestamp.now(),
+    });
+
+// Edit title
+await FirebaseFirestore.instance
+    .collection('tasks')
+    .doc(docId)
+    .update({'title': newTitle, 'updatedAt': Timestamp.now()});
+```
+
+### set(merge: true) — Upsert Without Overwriting
+
+```dart
+await FirebaseFirestore.instance
+    .collection('users')
+    .doc(uid)
+    .set({'lastWriteDemo': Timestamp.now()}, SetOptions(merge: true));
+// Only updates lastWriteDemo — all other fields preserved
+```
+
+### Input Validation
+
+All write operations validate before hitting Firestore:
+- Empty field check → SnackBar error, no write
+- Auth UID attached to every document
+- `updatedAt` timestamp on every mutation
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/screens/firestore_write_demo_screen.dart` | Add form + live list with inline edit/toggle |
+| `lib/services/firestore_service.dart` | `createPost()`, `updatePost()`, `createUserDocument()` |
+| `lib/screens/home/dashboard_screen.dart` | Real-world add/delete on posts |
+
+Access via "Firestore Writes" card on HomeScreen.
+
+### Reflection
+
+**Why secure writes matter** — unvalidated writes can corrupt data, cause crashes in readers, or allow users to overwrite other users' documents. Input validation + Firestore security rules are both required.
+
+**add vs set vs update** — `add()` is for new records with no known ID. `set()` is for known IDs (like user profiles keyed by UID). `update()` is for partial changes — it fails if the document doesn't exist, which is a useful safety net.
+
+**How validation prevents corruption** — checking for empty fields and correct types before writing ensures Firestore never receives malformed data that would break `fromFirestore()` deserialization.
+
+---
 
 This section documents all four Firestore read patterns implemented in NanheNest.
 
