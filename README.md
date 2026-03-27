@@ -1754,7 +1754,80 @@ This project was developed as part of **Kalvium Sprint #2**. All rights reserved
 
 ---
 
-## Sprint-2: Firestore Database Schema Design (Assignment 3.31)
+## Sprint-2: Reading Data from Firestore (Assignment 3.32)
+
+This section documents all four Firestore read patterns implemented in NanheNest.
+
+### Read Patterns Implemented
+
+| Pattern | API | Widget | Use Case |
+|---------|-----|--------|----------|
+| Real-time collection stream | `.collection().snapshots()` | `StreamBuilder` | Live post feed |
+| Filtered query stream | `.where().snapshots()` | `StreamBuilder` | My posts only |
+| Single doc one-time read | `.doc().get()` | `FutureBuilder` | Profile snapshot |
+| Single doc real-time stream | `.doc().snapshots()` | `StreamBuilder` | Live profile |
+
+### Real-time Collection Stream
+
+```dart
+StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('posts')
+      .orderBy('createdAt', descending: true)
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const CircularProgressIndicator();
+    }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Text('No data available');
+    }
+    final docs = snapshot.data!.docs;
+    return ListView.builder(
+      itemCount: docs.length,
+      itemBuilder: (context, i) {
+        final data = docs[i].data() as Map<String, dynamic>;
+        return ListTile(title: Text(data['content'] ?? ''));
+      },
+    );
+  },
+)
+```
+
+### Filtered Query
+
+```dart
+FirebaseFirestore.instance
+    .collection('posts')
+    .where('uid', isEqualTo: currentUser.uid)
+    .orderBy('createdAt', descending: true)
+    .snapshots()
+```
+
+### One-time Document Read (FutureBuilder)
+
+```dart
+FutureBuilder<DocumentSnapshot>(
+  future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) return const CircularProgressIndicator();
+    final data = snapshot.data!.data() as Map<String, dynamic>;
+    return Text('Name: ${data['displayName']}');
+  },
+)
+```
+
+### Key Files
+
+| File | What it demonstrates |
+|------|----------------------|
+| `lib/screens/firestore_read_demo_screen.dart` | All 4 read patterns in a tabbed UI |
+| `lib/screens/home/dashboard_screen.dart` | Real-time feed with `StreamBuilder` |
+| `lib/services/firestore_service.dart` | `getPostsStream()`, `getUserStream()`, `getUserDocument()` |
+
+Access the demo via the "Firestore Reads" card on the HomeScreen.
+
+---
 
 This section documents the Cloud Firestore data model for NanheNest.
 
