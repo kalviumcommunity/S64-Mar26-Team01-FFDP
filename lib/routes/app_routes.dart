@@ -52,7 +52,7 @@ class AppRoutes {
         settings: (_) => const SettingsScreen(),
         about: (_) => const AboutScreen(),
         devToolsDemo: (_) => const DevToolsDemoScreen(),
-        stateManagementDemo: (_) => const StateManagementDemo(),
+        stateManagementDemo: (_) => StateManagementDemo(),
         animationDemo: (_) => const AnimationDemoScreen(),
         firestoreReadDemo: (_) => const FirestoreReadDemoScreen(),
         firestoreWriteDemo: (_) => const FirestoreWriteDemoScreen(),
