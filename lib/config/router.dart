@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/main_scaffold.dart';
 import '../screens/home/dashboard_screen.dart';
@@ -24,6 +26,7 @@ class AppRouter {
       if (loggedIn && isLoggingIn) return '/';
       return null;
     },
+    routes: [
       // Auth Routes
       GoRoute(
         path: '/login',
@@ -92,7 +95,5 @@ class AppRouter {
         ],
       ),
     ],
-    // IMPORTANT: In a real app, you'd add a redirect for auth state
-    // redirect: (context, state) => ...
   );
 }

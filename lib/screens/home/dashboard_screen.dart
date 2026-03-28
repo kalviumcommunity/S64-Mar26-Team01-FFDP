@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/post_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
 
@@ -232,7 +233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 12),
 
             // Firestore Stream Builder
-            StreamBuilder<List<Map<String, dynamic>>>(
+            StreamBuilder<List<PostModel>>(
               stream: _firestoreService.getPostsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -273,8 +274,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     final post = posts[index];
-                    final createdAt = (post['createdAt'] as Timestamp).toDate();
-                    final isOwner = user?.uid == post['uid'];
+                    final createdAt = post.createdAt;
+                    final isOwner = user?.uid == post.uid;
 
                     return Card(
                       margin: const EdgeInsets.symmetric(
@@ -295,7 +296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      post['displayName'] ?? 'Anonymous',
+                                      post.displayName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleSmall
@@ -321,7 +322,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       PopupMenuItem(
                                         child: const Text('Delete'),
                                         onTap: () => _handleDeletePost(
-                                          post['id'],
+                                          post.postId,
                                         ),
                                       ),
                                     ],
@@ -332,7 +333,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                             // Post Content
                             Text(
-                              post['content'] ?? '',
+                              post.content,
                               style:
                                   Theme.of(context).textTheme.bodyMedium,
                             ),
@@ -348,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${post['likes'] ?? 0} Likes',
+                                  '${post.likes} Likes',
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall,
@@ -361,7 +362,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${post['comments'] ?? 0} Comments',
+                                  '${post.comments} Comments',
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall,

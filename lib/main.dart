@@ -1,31 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/config/firebase_bootstrap.dart';
+import 'firebase_options.dart';
 import 'routes/app_routes.dart';
 import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'screens/auth/auth_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/splash_screen.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'config/router.dart';
 import 'config/theme.dart';
+import 'providers/theme_provider.dart';
 
 /// Global navigator key used by NotificationService to push routes
 /// from outside the widget tree (e.g. on notification tap).
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'config/router.dart';
-import 'config/theme.dart';
-import 'providers/theme_provider.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e, stack) {
+    debugPrint('🚨 Unhandled Firebase error at startup!');
+    debugPrint('Error: $e');
+    debugPrint('Stack: $stack');
+    runApp(const FirebaseErrorApp());
+    return;
+  }
+
+  // Initialize push notifications after Firebase is ready.
+  try {
+    await NotificationService.instance.initialize(
+      onNotificationTap: (payload) {
+        final navigator = navigatorKey.currentState;
+        if (navigator == null) return;
+
+        switch (payload.type) {
+          case 'like':
+          case 'comment':
+            if (payload.postId != null) {
+              navigator.pushNamed(
+                AppRoutes.dashboard,
+                arguments: payload.postId,
+              );
+            }
+            break;
+          case 'message':
+            if (payload.chatId != null) {
+              navigator.pushNamed(
+                AppRoutes.realtimeChatList,
+                arguments: payload.chatId,
+              );
+            }
+            break;
+          default:
+            debugPrint('ℹ️ Unhandled notification type: ${payload.type}');
+        }
+      },
+    );
+  } catch (e) {
+    debugPrint('⚠️ Notification service init failed: $e');
+  }
+
   runApp(
-    // ProviderScope is required for Riverpod to store its state
     const ProviderScope(
       child: NanheNestApp(),
     ),
@@ -49,54 +91,6 @@ class NanheNestApp extends ConsumerWidget {
       routerConfig: AppRouter.router,
     );
   }
-}
-
-
-/// AuthGate handles navigation based on authentication state
-
-
-  try {
-    await FirebaseBootstrap.initialize();
-  } catch (e, stack) {
-    debugPrint('🚨 Unhandled Firebase error at startup!');
-    debugPrint('Error: $e');
-    debugPrint('Stack: $stack');
-    runApp(const FirebaseErrorApp());
-    return;
-  }
-
-  // Initialize push notifications after Firebase is ready.
-  await NotificationService.instance.initialize(
-    onNotificationTap: (payload) {
-      // Route the user to the appropriate screen based on notification type.
-      final navigator = navigatorKey.currentState;
-      if (navigator == null) return;
-
-      switch (payload.type) {
-        case 'like':
-        case 'comment':
-          if (payload.postId != null) {
-            navigator.pushNamed(
-              AppRoutes.dashboard,
-              arguments: payload.postId,
-            );
-          }
-          break;
-        case 'message':
-          if (payload.chatId != null) {
-            navigator.pushNamed(
-              AppRoutes.realtimeChatList,
-              arguments: payload.chatId,
-            );
-          }
-          break;
-        default:
-          debugPrint('ℹ️ Unhandled notification type: ${payload.type}');
-      }
-    },
-  );
-
-  runApp(const ProviderScope(child: NanheNestApp()));
 }
 
 class FirebaseErrorApp extends StatelessWidget {
@@ -130,24 +124,6 @@ class FirebaseErrorApp extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class NanheNestApp extends StatelessWidget {
-  const NanheNestApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'NanheNest',
-      debugShowCheckedModeBanner: false,
-      navigatorKey: navigatorKey,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      routes: AppRoutes.routes,
-      home: const AuthGate(),
     );
   }
 }

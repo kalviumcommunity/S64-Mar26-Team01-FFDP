@@ -1,26 +1,9 @@
 import 'package:flutter/material.dart';
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.person_outline, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Profile details coming soon'),
-          ],
-        ),
 import '../../routes/app_routes.dart';
 import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +169,7 @@ class _InfoTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.4),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: theme.colorScheme.primary),
