@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../utils/validators.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 
@@ -23,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -32,6 +34,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    // Enable real-time validation after the first submit attempt
+    if (_autovalidateMode == AutovalidateMode.disabled) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+    }
+
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
@@ -106,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
+            autovalidateMode: _autovalidateMode,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -137,15 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Email is required';
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
+                  validator: Validators.email,
                 ),
                 const SizedBox(height: 20),
 
@@ -167,10 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   validator: (value) {
-                    if (value?.isEmpty ?? true) {
+                    if (value == null || value.isEmpty) {
                       return 'Password is required';
                     }
-                    if (value!.length < 6) {
+                    if (value.length < 6) {
                       return 'Password must be at least 6 characters';
                     }
                     return null;
