@@ -14,8 +14,36 @@ import 'config/theme.dart';
 /// from outside the widget tree (e.g. on notification tap).
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+import 'config/router.dart';
+import 'config/theme.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const NanheNestApp());
+}
+
+class NanheNestApp extends StatelessWidget {
+  const NanheNestApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'NanheNest',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      routerConfig: AppRouter.router,
+    );
+  }
+}
+
+
+/// AuthGate handles navigation based on authentication state
+
 
   try {
     await FirebaseBootstrap.initialize();
