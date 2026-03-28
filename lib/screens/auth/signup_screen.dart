@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../utils/validators.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 
@@ -27,6 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreedToTerms = false;
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -38,21 +40,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _handleSignUp() async {
+    // Enable real-time validation after the first submit attempt
+    if (_autovalidateMode == AutovalidateMode.disabled) {
+      setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+    }
+
     if (_formKey.currentState!.validate()) {
       if (!_agreedToTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please agree to terms and conditions'),
-          ),
-        );
-        return;
-      }
-
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Passwords do not match'),
-            backgroundColor: Colors.red,
           ),
         );
         return;
@@ -102,6 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
+            autovalidateMode: _autovalidateMode,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -132,15 +130,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   hintText: 'Enter your full name',
                   controller: _nameController,
                   prefixIcon: Icons.person_outline,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Name is required';
-                    }
-                    if (value!.length < 2) {
-                      return 'Name must be at least 2 characters';
-                    }
-                    return null;
-                  },
+                  validator: Validators.name,
                 ),
                 const SizedBox(height: 20),
 
@@ -151,15 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Email is required';
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
+                  validator: Validators.email,
                 ),
                 const SizedBox(height: 20),
 
@@ -180,15 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       setState(() => _obscurePassword = !_obscurePassword);
                     },
                   ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Password is required';
-                    }
-                    if (value!.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
+                  validator: Validators.password,
                 ),
                 const SizedBox(height: 20),
 
@@ -210,12 +184,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           () => _obscureConfirmPassword = !_obscureConfirmPassword);
                     },
                   ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Please confirm your password';
-                    }
-                    return null;
-                  },
+                  validator: Validators.confirmPassword(_passwordController),
                 ),
                 const SizedBox(height: 20),
 

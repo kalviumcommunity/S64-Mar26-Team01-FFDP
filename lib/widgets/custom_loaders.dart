@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class CustomLoader extends StatelessWidget {
@@ -72,11 +74,11 @@ class _RotatingDotsState extends State<_RotatingDots>
       turns: _controller,
       child: Stack(
         children: List.generate(3, (index) {
-          final angle = (index * 2 * 3.14159 / 3);
+          final angle = index * 2 * pi / 3;
           return Align(
             alignment: Alignment(
-              0.8 * (index == 0 ? 1 : index == 1 ? -0.5 : -0.5),
-              0.8 * (index == 0 ? 0 : index == 1 ? 0.866 : -0.866),
+              0.8 * cos(angle),
+              0.8 * sin(angle),
             ),
             child: Container(
               width: widget.size * 0.2,

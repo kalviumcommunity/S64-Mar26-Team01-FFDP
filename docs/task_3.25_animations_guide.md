@@ -27,4 +27,4 @@ Loading states should reduce the perceived wait time and reassure the user that 
 
 - **Keep it Subtle**: Animations should be fast (generally 200-400ms) and not a distraction from the core task.
 - **Consistency**: Use the same curves and durations for similar actions across the app.
-- **Performance**: Favor `ImplicitAnimations` and optimized `AnimationControllers` to ensure 60fps performance on all devices.
+- **Performance**: Favor implicit animations (for example, Flutter's `ImplicitlyAnimatedWidget` and `Animated*` widgets) and optimized `AnimationControllers` to ensure 60fps performance on all devices.

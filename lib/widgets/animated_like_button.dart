@@ -56,15 +56,15 @@ class _AnimatedLikeButtonState extends State<AnimatedLikeButton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _handleTap,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Icon(
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: IconButton(
+        icon: Icon(
           widget.isLiked ? Icons.favorite : Icons.favorite_border,
           color: widget.isLiked ? Colors.red : Colors.grey,
           size: 28,
         ),
+        onPressed: widget.onTap == null ? null : _handleTap,
       ),
     );
   }
