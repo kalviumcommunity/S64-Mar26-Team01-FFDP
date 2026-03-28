@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 class PageTransitions {
   PageTransitions._();
 
-  /// Fades in the new page smoothly
+  /// Fade transition
   static PageRouteBuilder fade(Widget page, {Duration? transitionDuration}) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: transitionDuration ?? const Duration(milliseconds: 300),
+      transitionDuration:
+          transitionDuration ?? const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
           opacity: animation,
@@ -18,21 +19,23 @@ class PageTransitions {
     );
   }
 
-  /// Slides the new page from the right to the left
-  static PageRouteBuilder slide(Widget page, {Duration? transitionDuration}) {
+  /// Slide from right transition
+  static PageRouteBuilder slide(Widget page,
+      {Duration? transitionDuration}) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionDuration: transitionDuration ?? const Duration(milliseconds: 300),
+      transitionDuration:
+          transitionDuration ?? const Duration(milliseconds: 300),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0); // start off-screen right
-        const end = Offset.zero;         // end at its natural position
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
         const curve = Curves.easeInOutCubic;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
-          position: offsetAnimation,
+          position: animation.drive(tween),
           child: child,
         );
       },
