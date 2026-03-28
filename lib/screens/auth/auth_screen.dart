@@ -8,7 +8,7 @@ import '../../widgets/primary_button.dart';
 /// Combined authentication screen supporting both login and signup modes.
 /// Satisfies Sprint-2 Firebase Auth assignment requirements.
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({super.key});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();

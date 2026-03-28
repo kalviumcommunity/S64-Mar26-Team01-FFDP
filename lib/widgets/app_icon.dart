@@ -9,20 +9,18 @@ class AppIcon extends StatelessWidget {
   // Constructor for Material Icons
   const AppIcon.material(
     this.iconData, {
-    Key? key,
+    super.key,
     this.color,
     this.size = 24.0,
-  })  : assetPath = null,
-        super(key: key);
+  }) : assetPath = null;
 
   // Constructor for Custom Asset Icons
   const AppIcon.asset(
     this.assetPath, {
-    Key? key,
+    super.key,
     this.color,
     this.size = 24.0,
-  })  : iconData = null,
-        super(key: key);
+  }) : iconData = null;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class AppIcon extends StatelessWidget {
         size: size,
       );
     }
-    
+
     // Fallback if neither is provided
     return SizedBox(
       width: size,

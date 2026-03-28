@@ -20,8 +20,7 @@ class PageTransitions {
   }
 
   /// Slide from right transition
-  static PageRouteBuilder slide(Widget page,
-      {Duration? transitionDuration}) {
+  static PageRouteBuilder slide(Widget page, {Duration? transitionDuration}) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration:

@@ -144,7 +144,7 @@ class MapService {
     String title = 'My Location',
     BitmapDescriptor icon = BitmapDescriptor.defaultMarker,
   }) {
-    final markerId = MarkerId(_userLocationMarkerId);
+    const markerId = MarkerId(_userLocationMarkerId);
     _markerMap[markerId] = Marker(
       markerId: markerId,
       position: position,

@@ -26,7 +26,8 @@ class CustomLoader extends StatelessWidget {
           children: [
             CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(effectiveColor.withOpacity(0.2)),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  effectiveColor.withOpacity(0.2)),
             ),
             _RotatingDots(
               size: size,

@@ -170,7 +170,7 @@ class UploadResult {
     } else if (status == UploadStatus.cancelled) {
       return 'UploadResult.cancelled()';
     } else {
-      return 'UploadResult.progress(${ (progress * 100).toStringAsFixed(1) }%)';
+      return 'UploadResult.progress(${(progress * 100).toStringAsFixed(1)}%)';
     }
   }
 }

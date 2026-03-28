@@ -20,7 +20,8 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     redirect: (context, state) {
       final loggedIn = FirebaseAuth.instance.currentUser != null;
-      final isLoggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/signup';
+      final isLoggingIn = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/signup';
 
       if (!loggedIn && !isLoggingIn) return '/login';
       if (loggedIn && isLoggingIn) return '/';

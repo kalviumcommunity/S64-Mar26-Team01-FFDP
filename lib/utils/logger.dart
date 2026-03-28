@@ -12,7 +12,8 @@ class AppLogger {
     debugPrint('[$tag] $timestamp: $message');
   }
 
-  static void errorLog(String message, {String tag = 'ERROR', Object? error, StackTrace? stackTrace}) {
+  static void errorLog(String message,
+      {String tag = 'ERROR', Object? error, StackTrace? stackTrace}) {
     final timestamp = DateTime.now().toIso8601String();
     debugPrint('[$tag] $timestamp: $message');
     if (error != null) {

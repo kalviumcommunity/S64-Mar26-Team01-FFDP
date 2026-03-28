@@ -33,7 +33,7 @@ class AppLocation {
       latitude: position.latitude,
       longitude: position.longitude,
       accuracy: position.accuracy,
-      timestamp: position.timestamp ?? DateTime.now(),
+      timestamp: position.timestamp,
     );
   }
 

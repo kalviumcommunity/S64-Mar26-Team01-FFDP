@@ -12,47 +12,47 @@ class AssetsExampleScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Assets Management Example'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '1. Local Image Asset',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Example of local image loading using the utility widget
             // Will show error fallback safely since placeholder.png doesn't exist yet
-            const AppImage(
+            AppImage(
               assetPath: AppAssets.placeholderImage,
               width: 150,
               height: 150,
               fit: BoxFit.cover,
             ),
-            
-            const SizedBox(height: 24),
-            
-            const Text(
+
+            SizedBox(height: 24),
+
+            Text(
               '2. Material Icon (AppIcon)',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const AppIcon.material(
+            SizedBox(height: 8),
+            AppIcon.material(
               Icons.settings,
               size: 40,
               color: Colors.blue,
             ),
-            
-            const SizedBox(height: 24),
-            
-            const Text(
+
+            SizedBox(height: 24),
+
+            Text(
               '3. Asset Icon (AppIcon)',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Will show fallback since errorIcon doesn't exist yet
-            const AppIcon.asset(
+            AppIcon.asset(
               AppAssets.errorIcon,
               size: 40,
               color: Colors.red,

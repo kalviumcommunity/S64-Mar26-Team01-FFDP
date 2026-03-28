@@ -4,7 +4,7 @@ import '../../widgets/animations/animated_like_button.dart';
 import '../../widgets/animations/custom_loading_indicator.dart';
 
 class AnimationDemoScreen extends StatelessWidget {
-  const AnimationDemoScreen({Key? key}) : super(key: key);
+  const AnimationDemoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

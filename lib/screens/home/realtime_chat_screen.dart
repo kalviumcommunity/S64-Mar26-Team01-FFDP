@@ -206,16 +206,18 @@ class _RealtimeChatScreenState extends State<RealtimeChatScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No messages yet',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Start the conversation!',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[500],
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[500],
+                                  ),
                         ),
                       ],
                     ),
@@ -224,11 +226,13 @@ class _RealtimeChatScreenState extends State<RealtimeChatScreen> {
 
                 // Success state - render messages
                 final messages = snapshot.data!;
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _scrollToBottom());
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
@@ -246,7 +250,10 @@ class _RealtimeChatScreenState extends State<RealtimeChatScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Text(
                               _formatDate(message.timestamp),
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
                                     color: Colors.grey[500],
                                   ),
                             ),
@@ -292,7 +299,9 @@ class _RealtimeChatScreenState extends State<RealtimeChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
@@ -414,7 +423,9 @@ class _MessageBubble extends StatelessWidget {
                   Icon(
                     message.isRead ? Icons.done_all : Icons.done,
                     size: 14,
-                    color: message.isRead ? Colors.lightBlueAccent : Colors.white70,
+                    color: message.isRead
+                        ? Colors.lightBlueAccent
+                        : Colors.white70,
                   ),
                 ],
               ],

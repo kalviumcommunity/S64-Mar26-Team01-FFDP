@@ -18,7 +18,8 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.primaryContainer;
+    final effectiveBackgroundColor =
+        backgroundColor ?? theme.colorScheme.primaryContainer;
     final effectiveTextColor = theme.colorScheme.onPrimaryContainer;
 
     return Container(
@@ -35,8 +36,10 @@ class UserAvatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => _buildFallback(effectiveTextColor),
-                errorWidget: (context, url, error) => _buildFallback(effectiveTextColor),
+                placeholder: (context, url) =>
+                    _buildFallback(effectiveTextColor),
+                errorWidget: (context, url, error) =>
+                    _buildFallback(effectiveTextColor),
               )
             : _buildFallback(effectiveTextColor),
       ),

@@ -3,7 +3,7 @@ import '../../routes/app_routes.dart';
 import '../../services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -65,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 20),
             ],
 
-            _SectionHeader(title: 'Preferences'),
+            const _SectionHeader(title: 'Preferences'),
             _ToggleTile(
               icon: Icons.notifications_outlined,
               label: 'Push Notifications',
@@ -90,10 +90,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            _SectionHeader(title: 'Navigation Demo'),
+            const _SectionHeader(title: 'Navigation Demo'),
             Card(
               elevation: 0,
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -121,8 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     title: const Text('Go to About'),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppRoutes.about),
+                    onTap: () => Navigator.pushNamed(context, AppRoutes.about),
                   ),
                 ],
               ),
@@ -130,10 +129,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 24),
 
-            _SectionHeader(title: 'Account'),
+            const _SectionHeader(title: 'Account'),
             Card(
               elevation: 0,
-              color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -207,7 +206,7 @@ class _ToggleTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 0,
-      color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SwitchListTile(
         secondary: Icon(icon, color: theme.colorScheme.primary),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class StateManagementDemo extends StatefulWidget {
+  const StateManagementDemo({super.key});
+
   @override
   _StateManagementDemoState createState() => _StateManagementDemoState();
 }
@@ -30,7 +32,7 @@ class _StateManagementDemoState extends State<StateManagementDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('State Management Demo'),
+        title: const Text('State Management Demo'),
         backgroundColor: _counter >= 5 ? Colors.green : Colors.blue,
       ),
       body: Container(
@@ -39,7 +41,7 @@ class _StateManagementDemoState extends State<StateManagementDemo> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Button pressed:',
                 style: TextStyle(fontSize: 18),
               ),
@@ -51,7 +53,7 @@ class _StateManagementDemoState extends State<StateManagementDemo> {
                   color: _counter >= 10 ? Colors.red : Colors.black,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 _counter >= 10 ? '🎉 Milestone reached!' : 'Keep going!',
                 style: TextStyle(
@@ -59,7 +61,7 @@ class _StateManagementDemoState extends State<StateManagementDemo> {
                   color: _counter >= 10 ? Colors.green : Colors.grey,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -69,33 +71,33 @@ class _StateManagementDemoState extends State<StateManagementDemo> {
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text('Increment'),
+                    child: const Text('Increment'),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: _decrementCounter,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text('Decrement'),
+                    child: const Text('Decrement'),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: _resetCounter,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text('Reset'),
+                    child: const Text('Reset'),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               if (_counter > 0)
                 Text(
                   'Last action: ${DateTime.now().toString().split('.')[0]}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
             ],
           ),

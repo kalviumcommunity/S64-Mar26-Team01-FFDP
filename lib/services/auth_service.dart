@@ -98,7 +98,7 @@ class AuthService {
             .update({'fcmToken': token});
       }
     } catch (e) {
-      throw 'Failed to update FCM token: $e';
+      throw Exception('Failed to update FCM token: $e');
     }
   }
 
@@ -113,7 +113,7 @@ class AuthService {
             .update({'lastActive': Timestamp.now()});
       }
     } catch (e) {
-      throw 'Failed to update last active: $e';
+      throw Exception('Failed to update last active: $e');
     }
   }
 

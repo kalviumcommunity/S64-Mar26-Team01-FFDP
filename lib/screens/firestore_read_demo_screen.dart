@@ -56,7 +56,7 @@ class _AllPostsTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(
+        const _SectionHeader(
           icon: Icons.stream,
           label: 'Real-time stream — posts/ collection',
           subtitle: 'Updates instantly when Firestore data changes',
@@ -72,7 +72,7 @@ class _AllPostsTab extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return _EmptyState(
+                return const _EmptyState(
                   icon: Icons.article_outlined,
                   message: 'No posts yet.\nCreate one from the Dashboard.',
                 );
@@ -105,7 +105,7 @@ class _MyPostsTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(
+        const _SectionHeader(
           icon: Icons.filter_list,
           label: 'Filtered query — my posts only',
           subtitle: '.where("uid", isEqualTo: currentUser.uid)',
@@ -163,7 +163,7 @@ class _ProfileTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── One-time read with FutureBuilder ──────────────────────────
-          _SectionHeader(
+          const _SectionHeader(
             icon: Icons.download_outlined,
             label: 'One-time read — FutureBuilder',
             subtitle: '.collection("users").doc(uid).get()',
@@ -202,7 +202,7 @@ class _ProfileTab extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Real-time stream with StreamBuilder ───────────────────────
-          _SectionHeader(
+          const _SectionHeader(
             icon: Icons.sync,
             label: 'Real-time stream — StreamBuilder',
             subtitle: '.collection("users").doc(uid).snapshots()',

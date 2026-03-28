@@ -29,7 +29,7 @@ class PostModel {
   /// Create a PostModel from Firestore document
   factory PostModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
-    
+
     // Handle completely missing data
     if (data == null) {
       return PostModel(
@@ -44,7 +44,7 @@ class PostModel {
         tags: [],
       );
     }
-    
+
     return PostModel(
       postId: doc.id,
       uid: data['uid'] as String? ?? 'unknown',

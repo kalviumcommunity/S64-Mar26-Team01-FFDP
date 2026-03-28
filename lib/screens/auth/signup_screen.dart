@@ -8,9 +8,9 @@ class SignUpScreen extends StatefulWidget {
   final VoidCallback onLoginTap;
 
   const SignUpScreen({
-    Key? key,
+    super.key,
     required this.onLoginTap,
-  }) : super(key: key);
+  });
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -109,9 +109,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     Text(
                       'Join NanheNest',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -180,8 +181,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           : Icons.visibility,
                     ),
                     onPressed: () {
-                      setState(
-                          () => _obscureConfirmPassword = !_obscureConfirmPassword);
+                      setState(() =>
+                          _obscureConfirmPassword = !_obscureConfirmPassword);
                     },
                   ),
                   validator: Validators.confirmPassword(_passwordController),

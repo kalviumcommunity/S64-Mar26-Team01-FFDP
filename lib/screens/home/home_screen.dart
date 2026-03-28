@@ -72,7 +72,8 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Welcome back,',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -87,7 +88,8 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Explore your community and connect with others.',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                        color:
+                            theme.colorScheme.onPrimary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -117,28 +119,32 @@ class HomeScreen extends StatelessWidget {
                       label: 'Dashboard',
                       description: 'View your feed and posts',
                       color: Colors.blue,
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.dashboard),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.dashboard),
                     ),
                     _NavCard(
                       icon: Icons.person_outline,
                       label: 'Profile',
                       description: 'View and edit your profile',
                       color: Colors.purple,
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.profile),
                     ),
                     _NavCard(
                       icon: Icons.settings_outlined,
                       label: 'Settings',
                       description: 'App preferences and account',
                       color: Colors.orange,
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.settings),
                     ),
                     _NavCard(
                       icon: Icons.info_outline,
                       label: 'About',
                       description: 'Learn about NanheNest',
                       color: Colors.teal,
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.about),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.about),
                     ),
                     _NavCard(
                       icon: Icons.storage_outlined,
@@ -169,24 +175,24 @@ class HomeScreen extends StatelessWidget {
                       label: 'My Items (CRUD)',
                       description: 'Create, read, update, delete',
                       color: Colors.pink,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.crudDemo),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.crudDemo),
                     ),
                     _NavCard(
                       icon: Icons.hub_outlined,
                       label: 'Riverpod State',
                       description: 'Shared state across screens',
                       color: Colors.cyan,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.riverpodDemo),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.riverpodDemo),
                     ),
                     _NavCard(
                       icon: Icons.assignment_outlined,
                       label: 'Complex Form',
                       description: 'Multi-field validation demo',
                       color: Colors.brown,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.complexForm),
+                      onTap: () =>
+                          Navigator.pushNamed(context, AppRoutes.complexForm),
                     ),
                   ],
                 ),

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 /// A component displaying a grid of community events.
-/// Uses GridView.builder to lazily render grid items, ensuring high 
+/// Uses GridView.builder to lazily render grid items, ensuring high
 /// performance even with a large dataset.
 class EventGrid extends StatelessWidget {
   final int eventCount;
 
   const EventGrid({
-    Key? key,
+    super.key,
     this.eventCount = 12, // Default to generating 12 dummy events
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // GridView.builder calculates the exact positions of items based on 
+    // GridView.builder calculates the exact positions of items based on
     // the SilverGridDelegate configuration before actually building them.
     return GridView.builder(
       padding: const EdgeInsets.all(16),
@@ -78,7 +78,9 @@ class EventGrid extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
                           ),
                     ),
                     Text(

@@ -8,14 +8,13 @@ class ChatService {
   /// Get or create a chat room between two users
   Future<String> getOrCreateChat(String uid1, String uid2) async {
     try {
-      // Create a consistent chat ID by sorting UIDs
-      final chatId = uid1.hashCode <= uid2.hashCode 
-          ? '$uid1-$uid2' 
-          : '$uid2-$uid1';
-      
+      // Create a consistent chat ID by sorting UIDs (hashCode is not stable)
+      final ordered = <String>[uid1, uid2]..sort();
+      final chatId = '${ordered[0]}-${ordered[1]}';
+
       // Check if chat room already exists
       final chatDoc = await _firestore.collection('chats').doc(chatId).get();
-      
+
       if (!chatDoc.exists) {
         // Create new chat room
         await _firestore.collection('chats').doc(chatId).set({
@@ -25,10 +24,10 @@ class ChatService {
           'lastMessageTime': Timestamp.now(),
         });
       }
-      
+
       return chatId;
     } catch (e) {
-      throw 'Failed to get or create chat: $e';
+      throw Exception('Failed to get or create chat: $e');
     }
   }
 
@@ -48,7 +47,7 @@ class ChatService {
         'lastMessageTime': message.timestamp,
       });
     } catch (e) {
-      throw 'Failed to send message: $e';
+      throw Exception('Failed to send message: $e');
     }
   }
 
@@ -67,7 +66,7 @@ class ChatService {
             .toList();
       });
     } catch (e) {
-      throw 'Failed to get messages stream: $e';
+      throw Exception('Failed to get messages stream: $e');
     }
   }
 
@@ -86,7 +85,7 @@ class ChatService {
         }).toList();
       });
     } catch (e) {
-      throw 'Failed to get user chats stream: $e';
+      throw Exception('Failed to get user chats stream: $e');
     }
   }
 
@@ -107,7 +106,7 @@ class ChatService {
       }
       await batch.commit();
     } catch (e) {
-      throw 'Failed to mark messages as read: $e';
+      throw Exception('Failed to mark messages as read: $e');
     }
   }
 }

@@ -94,7 +94,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _uploadError = null;
     });
 
-    final uploadId = 'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
+    final uploadId =
+        'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
 
     final result = await StorageService.instance.uploadUserAvatar(
       userId: user.uid,
@@ -137,7 +138,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final user = AuthService().currentUser;
     if (user == null) return;
 
-    final uploadId = 'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
+    final uploadId =
+        'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
     final cancelled = await StorageService.instance.cancelUpload(uploadId);
 
     if (cancelled && mounted) {
@@ -197,7 +199,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // Avatar display
                     CircleAvatar(
                       radius: 60,
-                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      backgroundColor:
+                          theme.colorScheme.primary.withValues(alpha: 0.15),
                       backgroundImage: _selectedImage != null
                           ? FileImage(_selectedImage!)
                           : avatarImage,

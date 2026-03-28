@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({Key? key}) : super(key: key);
+  const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,8 @@ class AboutScreen extends StatelessWidget {
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.diversity_3, size: 56, color: Colors.white),
+                child: const Icon(Icons.diversity_3,
+                    size: 56, color: Colors.white),
               ),
 
               const SizedBox(height: 20),
@@ -55,7 +56,7 @@ class AboutScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              _AboutCard(
+              const _AboutCard(
                 icon: Icons.info_outline,
                 title: 'About the App',
                 body:
@@ -63,11 +64,10 @@ class AboutScreen extends StatelessWidget {
                     'It enables users to create profiles, share posts, interact in real time, and discover community events.',
               ),
 
-              _AboutCard(
+              const _AboutCard(
                 icon: Icons.star_outline,
                 title: 'Key Features',
-                body:
-                    '• Email/Password Authentication\n'
+                body: '• Email/Password Authentication\n'
                     '• Real-time Firestore Feed\n'
                     '• User Profiles\n'
                     '• Community Posts with Likes\n'
@@ -75,18 +75,17 @@ class AboutScreen extends StatelessWidget {
                     '• Dark Mode Support',
               ),
 
-              _AboutCard(
+              const _AboutCard(
                 icon: Icons.code_outlined,
                 title: 'Tech Stack',
-                body:
-                    '• Flutter 3.x (Dart)\n'
+                body: '• Flutter 3.x (Dart)\n'
                     '• Firebase Auth\n'
                     '• Cloud Firestore\n'
                     '• Firebase Storage\n'
                     '• Material Design 3',
               ),
 
-              _AboutCard(
+              const _AboutCard(
                 icon: Icons.school_outlined,
                 title: 'Project Context',
                 body:
@@ -162,7 +161,7 @@ class _AboutCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 0,
-      color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16),

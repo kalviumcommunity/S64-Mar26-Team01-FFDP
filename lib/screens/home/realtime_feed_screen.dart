@@ -270,16 +270,18 @@ class _RealtimeFeedScreenState extends State<RealtimeFeedScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No posts yet',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Be the first to post something!',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[500],
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[500],
+                                  ),
                         ),
                       ],
                     ),

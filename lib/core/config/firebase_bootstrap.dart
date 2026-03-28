@@ -21,7 +21,8 @@ class FirebaseBootstrap {
   static Future<void> _verifyConnection() async {
     try {
       final app = Firebase.app();
-      debugPrint('✅ Firebase Verification: Successfully connected to project -> ${app.options.projectId}');
+      debugPrint(
+          '✅ Firebase Verification: Successfully connected to project -> ${app.options.projectId}');
     } catch (e) {
       debugPrint('❌ Firebase Verification Failed: No default app found. $e');
     }

@@ -8,11 +8,11 @@ class CustomLoadingIndicator extends StatelessWidget {
   final double strokeWidth;
 
   const CustomLoadingIndicator({
-    Key? key,
+    super.key,
     this.size = 40.0,
     this.color,
     this.strokeWidth = 4.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +39,11 @@ class ShimmerLoadingBox extends StatefulWidget {
   final BorderRadius? borderRadius;
 
   const ShimmerLoadingBox({
-    Key? key,
+    super.key,
     required this.width,
     required this.height,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   State<ShimmerLoadingBox> createState() => _ShimmerLoadingBoxState();

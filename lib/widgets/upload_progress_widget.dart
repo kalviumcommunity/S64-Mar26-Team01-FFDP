@@ -112,9 +112,8 @@ class UploadProgressWidget extends StatelessWidget {
     if (name.length <= 30) return name;
     final ext = name.split('.').last;
     final baseName = name.substring(0, name.length - ext.length - 1);
-    final truncatedBase = baseName.length > 20
-        ? '${baseName.substring(0, 17)}...'
-        : baseName;
+    final truncatedBase =
+        baseName.length > 20 ? '${baseName.substring(0, 17)}...' : baseName;
     return '$truncatedBase.$ext';
   }
 }

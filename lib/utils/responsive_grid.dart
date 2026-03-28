@@ -10,12 +10,12 @@ class ResponsiveGrid extends StatelessWidget {
   final double runSpacing;
 
   const ResponsiveGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.breakpoint = 600.0, // Standard tablet breakpoint
     this.spacing = 16.0,
     this.runSpacing = 16.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class ResponsiveGrid extends StatelessWidget {
             spacing: spacing,
             runSpacing: runSpacing,
             // CrossAxisAlignment controls vertical alignment in the row
-            crossAxisAlignment: WrapCrossAlignment.start, 
+            crossAxisAlignment: WrapCrossAlignment.start,
             children: children,
           );
         } else {
@@ -45,7 +45,7 @@ class ResponsiveGrid extends StatelessWidget {
   // Helper method to inject spacing between children in the Column layout
   List<Widget> _addSpacingToChildren(List<Widget> children, double spacing) {
     if (children.isEmpty) return children;
-    
+
     final List<Widget> spacedChildren = [];
     for (int i = 0; i < children.length; i++) {
       spacedChildren.add(children[i]);

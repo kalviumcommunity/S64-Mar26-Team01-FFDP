@@ -11,13 +11,13 @@ class AnimatedLikeButton extends StatefulWidget {
   final Color unlikedColor;
 
   const AnimatedLikeButton({
-    Key? key,
+    super.key,
     this.initialIsLiked = false,
     this.size = 28.0,
     this.onToggle,
     this.likedColor = Colors.red,
     this.unlikedColor = Colors.grey,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedLikeButton> createState() => _AnimatedLikeButtonState();
@@ -35,7 +35,7 @@ class _AnimatedLikeButtonState extends State<AnimatedLikeButton>
     _isLiked = widget.initialIsLiked;
 
     _controller = AnimationController(
-       duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 

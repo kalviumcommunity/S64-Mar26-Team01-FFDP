@@ -16,10 +16,9 @@ class RealtimeService {
         .limit(50) // Limit for performance
         .snapshots()
         .handleError((error) {
-          // Handle errors gracefully
-          return Stream.value(<PostModel>[]);
-        })
-        .map((snapshot) {
+      // Handle errors gracefully
+      return Stream.value(<PostModel>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           return PostModel.fromFirestore(doc);
@@ -49,9 +48,8 @@ class RealtimeService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .handleError((error) {
-          return Stream.value(<PostModel>[]);
-        })
-        .map((snapshot) {
+      return Stream.value(<PostModel>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           return PostModel.fromFirestore(doc);
@@ -79,9 +77,8 @@ class RealtimeService {
         .doc(postId)
         .snapshots()
         .handleError((error) {
-          return Stream.value(null);
-        })
-        .map((doc) {
+      return Stream.value(null);
+    }).map((doc) {
       if (!doc.exists) return null;
       try {
         return PostModel.fromFirestore(doc);
@@ -112,9 +109,8 @@ class RealtimeService {
         .orderBy('timestamp', descending: false) // Chronological order
         .snapshots()
         .handleError((error) {
-          return Stream.value(<MessageModel>[]);
-        })
-        .map((snapshot) {
+      return Stream.value(<MessageModel>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           return MessageModel.fromFirestore(doc);
@@ -141,9 +137,8 @@ class RealtimeService {
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .handleError((error) {
-          return Stream.value(<List<Map<String, dynamic>>>[]);
-        })
-        .map((snapshot) {
+      return Stream.value(<List<Map<String, dynamic>>>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           final data = doc.data();
@@ -168,9 +163,8 @@ class RealtimeService {
         .limit(20)
         .snapshots()
         .handleError((error) {
-          return Stream.value(<List<Map<String, dynamic>>>[]);
-        })
-        .map((snapshot) {
+      return Stream.value(<List<Map<String, dynamic>>>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           final data = doc.data();
@@ -195,9 +189,8 @@ class RealtimeService {
         .doc(userId)
         .snapshots()
         .handleError((error) {
-          return Stream.value(null);
-        })
-        .map((doc) {
+      return Stream.value(null);
+    }).map((doc) {
       if (!doc.exists) return null;
       try {
         return doc.data();
@@ -217,9 +210,8 @@ class RealtimeService {
         .limit(20)
         .snapshots()
         .handleError((error) {
-          return Stream.value(<PostModel>[]);
-        })
-        .map((snapshot) {
+      return Stream.value(<PostModel>[]);
+    }).map((snapshot) {
       return snapshot.docs.map((doc) {
         try {
           return PostModel.fromFirestore(doc);

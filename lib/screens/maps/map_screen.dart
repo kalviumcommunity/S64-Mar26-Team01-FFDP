@@ -301,8 +301,7 @@ class _PermissionBanner extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            Icon(Icons.location_off,
-                color: theme.colorScheme.onErrorContainer),
+            Icon(Icons.location_off, color: theme.colorScheme.onErrorContainer),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

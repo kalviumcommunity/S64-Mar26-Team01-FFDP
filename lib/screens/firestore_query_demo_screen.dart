@@ -252,11 +252,36 @@ class _FirestoreQueryDemoScreenState extends State<FirestoreQueryDemoScreen> {
   Future<void> _seedSampleTasks() async {
     final uid = AuthService().currentUser?.uid ?? 'demo';
     final samples = [
-      {'title': 'Learn Flutter', 'description': 'Complete the Flutter course', 'isCompleted': false, 'priority': 1},
-      {'title': 'Build NanheNest', 'description': 'Implement all Firebase features', 'isCompleted': false, 'priority': 2},
-      {'title': 'Write unit tests', 'description': 'Cover validators and services', 'isCompleted': true, 'priority': 3},
-      {'title': 'Deploy to Play Store', 'description': 'Release v1.0 on Android', 'isCompleted': false, 'priority': 4},
-      {'title': 'Design Firestore schema', 'description': 'Plan collections and indexes', 'isCompleted': true, 'priority': 5},
+      {
+        'title': 'Learn Flutter',
+        'description': 'Complete the Flutter course',
+        'isCompleted': false,
+        'priority': 1
+      },
+      {
+        'title': 'Build NanheNest',
+        'description': 'Implement all Firebase features',
+        'isCompleted': false,
+        'priority': 2
+      },
+      {
+        'title': 'Write unit tests',
+        'description': 'Cover validators and services',
+        'isCompleted': true,
+        'priority': 3
+      },
+      {
+        'title': 'Deploy to Play Store',
+        'description': 'Release v1.0 on Android',
+        'isCompleted': false,
+        'priority': 4
+      },
+      {
+        'title': 'Design Firestore schema',
+        'description': 'Plan collections and indexes',
+        'isCompleted': true,
+        'priority': 5
+      },
     ];
 
     for (final s in samples) {

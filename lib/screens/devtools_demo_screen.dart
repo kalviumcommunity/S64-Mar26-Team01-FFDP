@@ -4,7 +4,7 @@ import '../utils/logger.dart';
 /// A demo screen designed for testing Hot Reload, the Debug Console,
 /// and Flutter DevTools features such as the Widget Inspector.
 class DevToolsDemoScreen extends StatefulWidget {
-  const DevToolsDemoScreen({Key? key}) : super(key: key);
+  const DevToolsDemoScreen({super.key});
 
   @override
   State<DevToolsDemoScreen> createState() => _DevToolsDemoScreenState();
@@ -43,7 +43,8 @@ class _DevToolsDemoScreenState extends State<DevToolsDemoScreen> {
       });
       AppLogger.debugLog('Async operation completed: $result', tag: 'DEMO');
     } catch (e, stack) {
-      AppLogger.errorLog('Async operation failed', tag: 'DEMO', error: e, stackTrace: stack);
+      AppLogger.errorLog('Async operation failed',
+          tag: 'DEMO', error: e, stackTrace: stack);
       setState(() {
         _asyncResult = 'Error: $e';
       });

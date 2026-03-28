@@ -3,15 +3,15 @@ import 'layout_components.dart';
 import 'stateless_avatar.dart';
 
 /// A component displaying a scrollable list of mockup feed posts.
-/// Uses ListView.builder for lazy loading, rendering items only when 
+/// Uses ListView.builder for lazy loading, rendering items only when
 /// they scroll into the viewport, which is crucial for performance.
 class FeedList extends StatelessWidget {
   final int itemCount;
 
   const FeedList({
-    Key? key,
+    super.key,
     this.itemCount = 20, // Default to generating 20 dummy posts
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

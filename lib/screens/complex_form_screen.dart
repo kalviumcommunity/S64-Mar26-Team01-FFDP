@@ -68,8 +68,9 @@ class _ComplexFormScreenState extends State<ComplexFormScreen> {
   String? _validatePassword(String? v) {
     if (v == null || v.isEmpty) return 'Password is required';
     if (v.length < 8) return 'Password must be at least 8 characters';
-    if (!v.contains(RegExp(r'[A-Z]')))
+    if (!v.contains(RegExp(r'[A-Z]'))) {
       return 'Must contain an uppercase letter';
+    }
     if (!v.contains(RegExp(r'[0-9]'))) return 'Must contain a number';
     return null;
   }
@@ -219,11 +220,11 @@ class _ComplexFormScreenState extends State<ComplexFormScreen> {
                 controller: _bioCtrl,
                 maxLines: 3,
                 maxLength: 160,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Bio *',
                   hintText: 'Tell us about yourself (max 160 chars)',
-                  prefixIcon: const Icon(Icons.notes_outlined),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.notes_outlined),
+                  border: OutlineInputBorder(),
                 ),
                 validator: _validateBio,
               ),

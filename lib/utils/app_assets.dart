@@ -6,8 +6,8 @@ class AppAssets {
   static const String iconPath = 'assets/icons';
 
   // Example placeholders (Add corresponding assets when available)
-  static const String placeholderImage = '$imagePath/placeholder.png'; 
-  static const String errorIcon = '$iconPath/error.png'; 
+  static const String placeholderImage = '$imagePath/placeholder.png';
+  static const String errorIcon = '$iconPath/error.png';
 
   // Usage: Add asset definitions below
   // static const String logo = '$imagePath/logo.png';

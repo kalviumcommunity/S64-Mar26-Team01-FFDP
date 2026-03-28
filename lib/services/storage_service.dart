@@ -64,8 +64,8 @@ class StorageService {
       // Compress image before upload
       final compressedImage = await _compressImage(imageFile);
       if (compressedImage == null) {
-        return UploadResult.failure(
-          error: const StorageException(
+        return const UploadResult.failure(
+          error: StorageException(
             type: StorageExceptionType.storageError,
             message: 'Image compression failed',
           ),
@@ -146,8 +146,8 @@ class StorageService {
       // Compress image before upload
       final compressedImage = await _compressImage(imageFile);
       if (compressedImage == null) {
-        return UploadResult.failure(
-          error: const StorageException(
+        return const UploadResult.failure(
+          error: StorageException(
             type: StorageExceptionType.storageError,
             message: 'Image compression failed',
           ),
@@ -216,8 +216,8 @@ class StorageService {
 
       final compressedImage = await _compressImage(imageFile);
       if (compressedImage == null) {
-        return UploadResult.failure(
-          error: const StorageException(
+        return const UploadResult.failure(
+          error: StorageException(
             type: StorageExceptionType.storageError,
             message: 'Image compression failed',
           ),
@@ -226,7 +226,8 @@ class StorageService {
 
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final ext = _getExtension(imageFile.path);
-      final ref = _firebaseStorage.ref().child('events/$eventId/$timestamp.$ext');
+      final ref =
+          _firebaseStorage.ref().child('events/$eventId/$timestamp.$ext');
       final metadata = SettableMetadata(
         contentType: _imageMimeTypes[ext] ?? 'image/jpeg',
       );
@@ -303,7 +304,8 @@ class StorageService {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final ext = _getExtension(mediaFile.path);
       final mimeType = _imageMimeTypes[ext] ?? 'application/octet-stream';
-      final ref = _firebaseStorage.ref().child('chat_media/$chatId/$timestamp.$ext');
+      final ref =
+          _firebaseStorage.ref().child('chat_media/$chatId/$timestamp.$ext');
       final metadata = SettableMetadata(contentType: mimeType);
 
       final task = ref.putFile(fileToUpload, metadata);
@@ -369,7 +371,8 @@ class StorageService {
       // Handle "file not found" gracefully — it's already deleted
       // Storage uses 'object-not-found' code for missing files
       if (e.code == 'object-not-found' || e.code == '404') {
-        debugPrint('StorageService: File not found (already deleted?): $filePath');
+        debugPrint(
+            'StorageService: File not found (already deleted?): $filePath');
         return;
       }
       rethrow;
@@ -416,7 +419,10 @@ class StorageService {
     final sizeInBytes = file.lengthSync();
     final sizeInMB = sizeInBytes / (1024 * 1024);
     if (sizeInMB > 10) {
-      return (false, 'File size (${sizeInMB.toStringAsFixed(1)} MB) exceeds 10 MB limit');
+      return (
+        false,
+        'File size (${sizeInMB.toStringAsFixed(1)} MB) exceeds 10 MB limit'
+      );
     }
 
     // Check extension
@@ -430,7 +436,9 @@ class StorageService {
 
   /// Get file extension from path (lowercase, without dot).
   static String _getExtension(String filePath) {
-    final fileName = filePath.contains('/') ? filePath.split('/').last : filePath.split('\\').last;
+    final fileName = filePath.contains('/')
+        ? filePath.split('/').last
+        : filePath.split('\\').last;
     final parts = fileName.toLowerCase().split('.');
     return parts.length > 1 ? parts.last : '';
   }
@@ -501,7 +509,8 @@ class StorageService {
         if (compressedSize < originalSize) {
           return compressedFile;
         } else {
-          debugPrint('StorageService: Compression did not reduce size, using original');
+          debugPrint(
+              'StorageService: Compression did not reduce size, using original');
           _cleanupTempFile(compressedFile, file);
           return file;
         }

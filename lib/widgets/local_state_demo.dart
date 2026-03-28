@@ -41,7 +41,9 @@ class _LocalStateDemoState extends State<LocalStateDemo> {
               duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: _isLiked ? Colors.red.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+                color: _isLiked
+                    ? Colors.red.withOpacity(0.1)
+                    : Colors.grey.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
                   color: _isLiked ? Colors.red : Colors.grey,
@@ -81,9 +83,9 @@ class _LocalStateDemoState extends State<LocalStateDemo> {
                 Text(
                   '$_counter',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton.icon(

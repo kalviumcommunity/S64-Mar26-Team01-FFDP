@@ -363,7 +363,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     // Gallery button
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _isUploading || _isPosting ? null : _pickImage,
+                        onPressed:
+                            _isUploading || _isPosting ? null : _pickImage,
                         icon: const Icon(Icons.photo_library),
                         label: const Text('Gallery'),
                         style: OutlinedButton.styleFrom(
@@ -376,7 +377,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     // Camera button
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _isUploading || _isPosting ? null : _takePhoto,
+                        onPressed:
+                            _isUploading || _isPosting ? null : _takePhoto,
                         icon: const Icon(Icons.camera_alt),
                         label: const Text('Camera'),
                         style: OutlinedButton.styleFrom(

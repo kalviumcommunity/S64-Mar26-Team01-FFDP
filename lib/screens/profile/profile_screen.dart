@@ -61,7 +61,8 @@ class ProfileScreen extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 48,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                backgroundColor:
+                    theme.colorScheme.primary.withValues(alpha: 0.15),
                 child: Text(
                   (user?.displayName?.isNotEmpty == true
                           ? user!.displayName![0]
