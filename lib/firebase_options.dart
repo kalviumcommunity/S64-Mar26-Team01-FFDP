@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -44,39 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_WEB_MESSAGING_SENDER_ID',
-    projectId: 'your-firebase-project-id',
-    authDomain: 'your-firebase-project-id.firebaseapp.com',
-    databaseURL: 'https://your-firebase-project-id.firebaseio.com',
-    storageBucket: 'your-firebase-project-id.appspot.com',
-    measurementId: 'YOUR_WEB_MEASUREMENT_ID',
+    apiKey: 'PASTE_YOUR_WEB_API_KEY_HERE',
+    appId: 'PASTE_YOUR_WEB_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_WEB_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    authDomain: 'your-nanhenest-project-id.firebaseapp.com',
+    databaseURL: 'https://your-nanhenest-project-id.firebaseio.com',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    measurementId: 'PASTE_YOUR_WEB_MEASUREMENT_ID_HERE',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_ANDROID_MESSAGING_SENDER_ID',
-    projectId: 'your-firebase-project-id',
-    storageBucket: 'your-firebase-project-id.appspot.com',
+    apiKey: 'PASTE_YOUR_ANDROID_API_KEY_HERE',
+    appId: 'PASTE_YOUR_ANDROID_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_ANDROID_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_IOS_MESSAGING_SENDER_ID',
-    projectId: 'your-firebase-project-id',
-    storageBucket: 'your-firebase-project-id.appspot.com',
+    apiKey: 'PASTE_YOUR_IOS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_IOS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_IOS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
     iosBundleId: 'com.example.nanhenest',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR_MACOS_API_KEY',
-    appId: 'YOUR_MACOS_APP_ID',
-    messagingSenderId: 'YOUR_MACOS_MESSAGING_SENDER_ID',
-    projectId: 'your-firebase-project-id',
-    storageBucket: 'your-firebase-project-id.appspot.com',
-    iosBundleId: 'com.example.nanhenest',
+    apiKey: 'PASTE_YOUR_MACOS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_MACOS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_MACOS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    iosBundleId: 'com.example.nanhenest.RunnerTests',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'PASTE_YOUR_WINDOWS_API_KEY_HERE',
+    appId: 'PASTE_YOUR_WINDOWS_APP_ID_HERE',
+    messagingSenderId: 'PASTE_YOUR_WINDOWS_MESSAGING_SENDER_ID_HERE',
+    projectId: 'your-nanhenest-project-id',
+    authDomain: 'your-nanhenest-project-id.firebaseapp.com',
+    storageBucket: 'your-nanhenest-project-id.appspot.com',
+    measurementId: 'PASTE_YOUR_WINDOWS_MEASUREMENT_ID_HERE',
   );
 }

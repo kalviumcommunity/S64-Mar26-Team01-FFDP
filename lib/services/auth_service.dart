@@ -66,7 +66,7 @@ class AuthService {
     try {
       await _firebaseAuth.signOut();
     } catch (e) {
-      throw 'Failed to sign out: $e';
+      throw Exception('Failed to sign out: $e');
     }
   }
 
@@ -117,25 +117,48 @@ class AuthService {
     }
   }
 
-  /// Handle Firebase Auth exceptions
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'email-already-in-use':
-        return 'An account already exists for that email.';
-      case 'invalid-email':
-        return 'The email address is not valid.';
-      case 'user-disabled':
-        return 'The user account has been disabled.';
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided.';
-      case 'operation-not-allowed':
-        return 'Email/password accounts are not enabled.';
-      default:
-        return 'Authentication error: ${e.message}';
+  /// Auth-gated profile update — demonstrates the security pattern required
+  /// by Firestore rules: request.auth.uid == uid.
+  ///
+  /// This will throw a [FirebaseException] with PERMISSION_DENIED if:
+  ///   - The user is not signed in, or
+  ///   - The uid does not match the signed-in user's UID.
+  Future<void> updateUserProfile({
+    required String uid,
+    String? displayName,
+    String? bio,
+  }) async {
+    // Guard: must be authenticated and operating on own document
+    final currentUid = _firebaseAuth.currentUser?.uid;
+    if (currentUid == null) throw Exception('Not authenticated');
+    if (currentUid != uid) throw Exception('Permission denied');
+
+    final updates = <String, dynamic>{
+      'lastActive': Timestamp.now(),
+    };
+    if (displayName != null) updates['displayName'] = displayName;
+    if (bio != null) updates['bio'] = bio;
+
+    try {
+      await _firebaseFirestore.collection('users').doc(uid).update(updates);
+    } on FirebaseException catch (e) {
+      throw Exception('Firestore error: ${e.message}');
     }
+  }
+
+  /// Handle Firebase Auth exceptions and return a user-friendly Exception
+  Exception _handleAuthException(FirebaseAuthException e) {
+    final message = switch (e.code) {
+      'weak-password' => 'The password provided is too weak.',
+      'email-already-in-use' => 'An account already exists for that email.',
+      'invalid-email' => 'The email address is not valid.',
+      'user-disabled' => 'The user account has been disabled.',
+      'user-not-found' => 'No user found for that email.',
+      'wrong-password' => 'Wrong password provided.',
+      'invalid-credential' => 'Invalid email or password.',
+      'operation-not-allowed' => 'Email/password accounts are not enabled.',
+      _ => 'Authentication error: ${e.message}',
+    };
+    return Exception(message);
   }
 }

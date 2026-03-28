@@ -1,34 +1,44 @@
 import 'package:flutter/material.dart';
 
-class FadeTransitionRoute<T> extends PageRouteBuilder<T> {
-  final Widget page;
+/// A utility class providing common Custom PageRouteBuilders
+class PageTransitions {
+  PageTransitions._();
 
-  FadeTransitionRoute({required this.page})
-      : super(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
+  /// Fade transition
+  static PageRouteBuilder fade(Widget page, {Duration? transitionDuration}) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionDuration:
+          transitionDuration ?? const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
         );
-}
+      },
+    );
+  }
 
-class SlideRightRoute<T> extends PageRouteBuilder<T> {
-  final Widget page;
+  /// Slide from right transition
+  static PageRouteBuilder slide(Widget page,
+      {Duration? transitionDuration}) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionDuration:
+          transitionDuration ?? const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOutCubic;
 
-  SlideRightRoute({required this.page})
-      : super(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(1.0, 0.0);
-            const end = Offset.zero;
-            const curve = Curves.ease;
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
-            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-            return SlideTransition(
-              position: animation.drive(tween),
-              child: child,
-            );
-          },
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
         );
+      },
+    );
+  }
 }

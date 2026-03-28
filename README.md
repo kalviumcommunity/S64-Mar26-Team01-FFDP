@@ -19,7 +19,7 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 **NanheNest** is a cross-platform social and community mobile application built with **Flutter** and **Firebase**. It enables users to create profiles, share posts with media, interact through likes and comments, engage in real-time messaging, discover nearby community events via maps, and receive push notifications for relevant activity.
 
@@ -27,7 +27,7 @@ NanheNest targets **Android** (primary) and **iOS** (secondary) platforms throug
 
 ---
 
-## ✨ Features
+##  Features
 
 | # | Feature | Description |
 |---|---------|-------------|
@@ -44,7 +44,7 @@ NanheNest targets **Android** (primary) and **iOS** (secondary) platforms throug
 
 ---
 
-## 🏗 Architecture
+##  Architecture
 
 NanheNest follows a **three-tier client-serverless architecture** combined with the **MVVM pattern** on the client side.
 
@@ -86,13 +86,15 @@ NanheNest follows a **three-tier client-serverless architecture** combined with 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 nanhenest/
 ├── lib/
 │   ├── main.dart              # App entry point, theme config, route setup
-│   ├── config/                # Firebase config, constants, theme data
+│   ├── core/
+│   │   └── config/            # Firebase bootstrap and initialization wrapper
+│   ├── config/                # App config, constants, theme data
 │   ├── models/                # Data model classes (User, Post, Event, etc.)
 │   ├── providers/             # Riverpod providers for state management
 │   ├── services/              # Firebase service wrappers
@@ -123,7 +125,7 @@ nanhenest/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -161,6 +163,8 @@ cd S64-Mar26-Team01-FFDP
 dart pub global activate flutterfire_cli
 flutterfire configure
 ```
+
+*Note: The project uses a custom `FirebaseBootstrap` class (`lib/core/config/firebase_bootstrap.dart`) to robustly initialize Firebase across all platforms (including explicit iOS and macOS support) and provides an integrated fallback UI for startup errors.*
 
 ### 4. Add Google Maps API Key
 
@@ -210,7 +214,7 @@ flutter run --release
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 
 ```yaml
 dependencies:
@@ -232,7 +236,7 @@ dependencies:
 
 ---
 
-## 🗃 Data Models
+##  Data Models
 
 ### UserModel
 
@@ -301,7 +305,7 @@ class EventModel {
 
 ---
 
-## 🔧 Service Layer
+## Service Layer
 
 Each service class encapsulates all Firebase interactions for a specific domain and is provided as a singleton via Riverpod.
 
@@ -348,9 +352,81 @@ Each service class encapsulates all Firebase interactions for a specific domain 
 
 ---
 
-## 🔄 State Management
+## State Management
 
 NanheNest uses **Riverpod 2.x** for reactive, testable state management.
+
+### Local State Management with setState()
+
+For simple, local UI state that doesn't need to be shared across the app, we use Flutter's built-in `setState()` method. This is demonstrated in our `StateManagementDemo` widget:
+
+#### Key Concepts:
+- **StatefulWidget**: Widgets that can change dynamically based on user interactions
+- **setState()**: Notifies Flutter that the widget's internal state has changed and needs to be rebuilt
+- **Local vs Global State**: Use `setState()` for widget-specific state, Riverpod for app-wide state
+
+#### Implementation Example:
+```dart
+class StateManagementDemo extends StatefulWidget {
+  @override
+  _StateManagementDemoState createState() => _StateManagementDemoState();
+}
+
+class _StateManagementDemoState extends State<StateManagementDemo> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('State Management Demo'),
+        backgroundColor: _counter >= 5 ? Colors.green : Colors.blue,
+      ),
+      body: Container(
+        color: _counter >= 10 ? Colors.amber[100] : Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Button pressed:'),
+              Text('$_counter times', 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ElevatedButton(
+                onPressed: _incrementCounter,
+                child: Text('Increment'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### Conditional UI Updates:
+The demo showcases dynamic UI changes based on state:
+- **App Bar Color**: Changes from blue to green when counter ≥ 5
+- **Background Color**: Changes to amber when counter ≥ 10
+- **Text Color**: Changes to red when milestone is reached
+- **Celebration Message**: Appears when counter ≥ 10
+
+#### Best Practices:
+1. **Always wrap state changes in setState()**: Direct variable updates won't trigger UI rebuilds
+2. **Avoid setState() in build()**: This creates infinite rebuild loops
+3. **Use local state for widget-specific data**: Counter values, form inputs, toggle states
+4. **Keep setState() calls minimal**: Only update the specific data that changed
+
+#### Common Mistakes to Avoid:
+- Updating state without setState(): `counter++;` (won't rebuild UI)
+- Calling setState() in build() method (causes infinite loops)
+- Using setState() for app-wide state (use Riverpod instead)
 
 | Provider | Type | Purpose |
 |----------|------|---------|
@@ -389,7 +465,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
 
 ---
 
-## 🔀 User Flows
+## User Flows
 
 ### 1. Onboarding & Authentication
 
@@ -552,21 +628,21 @@ flowchart TD
 
 ---
 
-## 📱 Navigation Structure
+## Navigation Structure
 
 The app uses a `BottomNavigationBar` with **5 main tabs**, each with its own Navigator stack for independent navigation history.
 
 | # | Tab | Root Screen | Child Screens |
 |---|-----|-------------|---------------|
-| 1 | 🏠 Home | `FeedScreen` | `PostDetailScreen`, `CreatePostScreen`, `UserProfileScreen` |
-| 2 | 🔍 Search | `SearchScreen` | `SearchResultsScreen`, `UserProfileScreen` |
-| 3 | 🗺 Map | `MapScreen` | `EventDetailScreen`, `CreateEventScreen` |
-| 4 | 💬 Chat | `ChatListScreen` | `ChatRoomScreen` |
-| 5 | 👤 Profile | `MyProfileScreen` | `EditProfileScreen`, `SettingsScreen` |
+| 1 | Home | `FeedScreen` | `PostDetailScreen`, `CreatePostScreen`, `UserProfileScreen` |
+| 2 | Search | `SearchScreen` | `SearchResultsScreen`, `UserProfileScreen` |
+| 3 | Map | `MapScreen` | `EventDetailScreen`, `CreateEventScreen` |
+| 4 | Chat | `ChatListScreen` | `ChatRoomScreen` |
+| 5 | Profile | `MyProfileScreen` | `EditProfileScreen`, `SettingsScreen` |
 
 ---
 
-## 🗄 Firestore Database Schema
+## Firestore Database Schema
 
 ### `/users` Collection
 ```
@@ -644,7 +720,7 @@ events/{eventId}
 
 ---
 
-## ☁️ Cloud Functions
+## Cloud Functions
 
 Runtime: **Node.js 18 (TypeScript)**
 
@@ -659,7 +735,7 @@ Runtime: **Node.js 18 (TypeScript)**
 
 ---
 
-## 🔐 Security
+## Security
 
 ### Firestore Security Rules
 
@@ -680,7 +756,7 @@ Runtime: **Node.js 18 (TypeScript)**
 
 ---
 
-## 🛡 Error Handling
+## Error Handling
 
 | Error Type | Handling | User Experience |
 |------------|----------|-----------------|
@@ -740,7 +816,7 @@ flutter test integration_test/
 
 ---
 
-## 📊 Non-Functional Requirements
+## Non-Functional Requirements
 
 | Category | Requirement |
 |----------|-------------|
@@ -754,7 +830,7 @@ flutter test integration_test/
 
 ---
 
-## 🔁 CI/CD Pipeline
+## CI/CD Pipeline
 
 ```
 Push / PR to main
@@ -773,7 +849,7 @@ GitHub Actions
 
 ---
 
-## 🔧 Concept 2: Firebase Authentication & Storage Implementation
+## Concept 2: Firebase Authentication & Storage Implementation
 
 This section documents the implementation of **Concept 2**, which focuses on integrating Firebase Authentication and Firebase Storage into NanheNest.
 
@@ -999,7 +1075,7 @@ Storage errors include:
 
 ---
 
-## 🔥 Concept 3.10: Firebase Authentication & Firestore Integration
+## Concept 3.10: Firebase Authentication & Firestore Integration
 
 This section documents the implementation of **Concept 3.10**, which provides complete Firebase Authentication and Firestore CRUD operations for the NanheNest application.
 
@@ -1306,7 +1382,7 @@ By implementing Concept 3.10, you'll understand:
 
 ---
 
-## 📁 Concept 3.12: Flutter Project Structure Exploration
+## Concept 3.12: Flutter Project Structure Exploration
 
 This section documents **Concept 3.12**, which explores and documents the Flutter project folder structure, best practices for code organization, and how this structure supports team collaboration and scalability.
 
@@ -1384,22 +1460,22 @@ S64-Mar26-Team01-FFDP/
 
 ### Why This Structure?
 
-#### ✅ **Scalability**
+#### **Scalability**
 - New features added to appropriate folders without disrupting existing code
 - Clear boundaries between layers prevent spaghetti code
 - Easy to add new screens, services, or models following the pattern
 
-#### ✅ **Team Collaboration**
+#### **Team Collaboration**
 - Different developers can work on auth, home, and services simultaneously
 - Clear naming and organization reduce merge conflicts
 - New team members understand structure quickly
 
-#### ✅ **Maintainability**
+#### **Maintainability**
 - Business logic separated from UI (services vs screens)
 - Data models centralized in one folder
 - Reusable widgets prevent code duplication
 
-#### ✅ **Testing**
+#### **Testing**
 - Services can be unit tested independently
 - Widgets can be tested in isolation
 - Clear separation makes mock objects easier to create
@@ -1449,9 +1525,9 @@ Defines iOS app metadata, permissions, and display settings.
 
 **1. Separation of Concerns**
 ```
-✅ screens/auth/login_screen.dart → UI only
-✅ services/auth_service.dart → Business logic only
-✅ models/user_model.dart → Data structure only
+screens/auth/login_screen.dart → UI only
+services/auth_service.dart → Business logic only
+models/user_model.dart → Data structure only
 ```
 
 **2. Feature-Based Organization**
@@ -1479,13 +1555,13 @@ widgets/
 
 ### Best Practices Applied
 
-✅ **No Code in main.dart** — Used only for initialization and routing
-✅ **Layered Architecture** — UI, services, and models separated
-✅ **DRY (Don't Repeat Yourself)** — Reusable widgets and services
-✅ **Single Responsibility** — Each file has one clear purpose
-✅ **Clear Naming** — File names describe their content
-✅ **Documentation** — Comments explain complex logic
-✅ **Version Control** — .gitignore excludes build artifacts
+**No Code in main.dart** — Used only for initialization and routing
+**Layered Architecture** — UI, services, and models separated
+**DRY (Don't Repeat Yourself)** — Reusable widgets and services
+**Single Responsibility** — Each file has one clear purpose
+**Clear Naming** — File names describe their content
+**Documentation** — Comments explain complex logic
+**Version Control** — .gitignore excludes build artifacts
 
 ### For More Details
 
@@ -1526,14 +1602,1105 @@ By exploring Concept 3.12, you understand:
 
 ---
 
-## 📄 License
+## Concept 3.16: Multi-Screen Navigation Using Navigator and Routes
+
+This section documents **Concept 3.16**, implementing multi-screen navigation using Flutter's `Navigator` class and named routes.
+
+### Navigation Overview
+
+Flutter manages screen transitions via a navigation **stack**. Each `Navigator.push` adds a screen on top; each `Navigator.pop` removes it.
+
+```text
+Stack visualization:
+  [ AuthGate ]          ← initial screen
+  [ HomeScreen ]        ← push '/'
+  [ ProfileScreen ]     ← pushNamed('/profile')
+  [ SettingsScreen ]    ← pushNamed('/settings') ← currently visible
+       ↑ pop() goes back down the stack
+```
+
+### Screens Created
+
+| Screen    | Route        | File                                        |
+| --------- | ------------ | ------------------------------------------- |
+| Home      | `/`          | `lib/screens/home/home_screen.dart`         |
+| Dashboard | `/dashboard` | `lib/screens/home/dashboard_screen.dart`    |
+| Profile   | `/profile`   | `lib/screens/profile/profile_screen.dart`   |
+| Settings  | `/settings`  | `lib/screens/settings/settings_screen.dart` |
+| About     | `/about`     | `lib/screens/about/about_screen.dart`       |
+| Login     | `/login`     | `lib/screens/auth/login_screen.dart`        |
+| Sign Up   | `/signup`    | `lib/screens/auth/signup_screen.dart`       |
+
+### Route Definitions — `lib/routes/app_routes.dart`
+
+All routes are centralized in `AppRoutes`:
+
+```dart
+class AppRoutes {
+  static const String home      = '/';
+  static const String profile   = '/profile';
+  static const String settings  = '/settings';
+  static const String about     = '/about';
+  static const String dashboard = '/dashboard';
+
+  static Map<String, WidgetBuilder> get routes => {
+    home:      (_) => const HomeScreen(),
+    profile:   (_) => const ProfileScreen(),
+    settings:  (_) => const SettingsScreen(),
+    about:     (_) => const AboutScreen(),
+    dashboard: (_) => const DashboardScreen(),
+  };
+}
+```
+
+### Wired in `main.dart`
+
+```dart
+return MaterialApp(
+  routes: AppRoutes.routes,   // all named routes registered here
+  home: const AuthGate(),     // auth-aware entry point
+);
+```
+
+### Navigation in Action
+
+**Push to a screen:**
+
+```dart
+Navigator.pushNamed(context, AppRoutes.profile);
+```
+
+**Push with arguments (data passing between screens):**
+
+```dart
+Navigator.pushNamed(
+  context,
+  AppRoutes.settings,
+  arguments: 'Navigated here from Profile screen',
+);
+```
+
+**Read arguments in the target screen:**
+
+```dart
+final String? message =
+    ModalRoute.of(context)?.settings.arguments as String?;
+```
+
+**Go back:**
+
+```dart
+Navigator.pop(context);
+```
+
+**Pop all the way to root:**
+
+```dart
+Navigator.of(context).popUntil((route) => route.isFirst);
+```
+
+### Navigation Flow Diagram
+
+```text
+[AuthGate]
+    │
+    ├─ (not logged in) → [LoginScreen] ⇄ [SignUpScreen]
+    │
+    └─ (logged in) → [HomeScreen]
+                          │
+                          ├── pushNamed('/dashboard') → [DashboardScreen]
+                          │                                     └── pop() ↩
+                          ├── pushNamed('/profile') ──→ [ProfileScreen]
+                          │                               └── pushNamed('/settings', args)
+                          │                               └── pop() ↩
+                          ├── pushNamed('/settings') → [SettingsScreen]
+                          │                               └── pushNamed('/about')
+                          │                               └── pop() ↩
+                          └── pushNamed('/about') ───→ [AboutScreen]
+                                                          └── pop() ↩
+```
+
+### Why Named Routes?
+
+| Benefit          | Explanation                                                            |
+| ---------------- | ---------------------------------------------------------------------- |
+| **Readability**  | `/profile` is clearer than instantiating `ProfileScreen()` everywhere  |
+| **Centralized**  | Change a route once in `AppRoutes` — all usages update automatically   |
+| **Arguments**    | Pass data cleanly via `arguments` without changing widget constructors |
+| **Deep linking** | Named routes map directly to app deep link paths                       |
+| **Testing**      | Routes are testable independently                                      |
+
+### How Navigator Manages the Stack
+
+1. App starts → `AuthGate` is pushed as root
+2. `Navigator.pushNamed(context, '/profile')` → `ProfileScreen` pushed on top
+3. Inside `ProfileScreen`, `Navigator.pushNamed(context, '/settings')` → `SettingsScreen` on top
+4. `Navigator.pop(context)` in `SettingsScreen` → returns to `ProfileScreen`
+5. `Navigator.pop(context)` in `ProfileScreen` → returns to `HomeScreen`
+
+### 3.16 Learning Outcomes
+
+1. **Navigator Stack**: Screens are managed as a push/pop stack
+2. **Named Routes**: Centralized route map keeps navigation organized
+3. **Arguments**: `ModalRoute.of(context)?.settings.arguments` for data passing
+4. **Auth-aware navigation**: `popUntil(isFirst)` cleanly handles sign-out
+5. **Deep structure**: Routes work across any nesting level in the widget tree
+
+---
+
+
+---
+
+## Sprint-2: Full CRUD Flow — UI + Firestore + Auth (Assignment 3.42)
+
+Complete Create, Read, Update, Delete using `users/{uid}/items/{itemId}` subcollection.
+
+### Data Path
+
+```
+users/{uid}/items/{itemId}
+├── title       : string
+├── description : string
+├── createdAt   : number (millisecondsSinceEpoch)
+└── updatedAt   : number (on edit)
+```
+
+### CRUD Operations
+
+```dart
+final items = FirebaseFirestore.instance
+    .collection('users').doc(uid).collection('items');
+
+// C — Create
+await items.add({'title': t, 'description': d,
+    'createdAt': DateTime.now().millisecondsSinceEpoch});
+
+// R — Real-time read
+items.orderBy('createdAt', descending: true).snapshots()
+
+// U — Update
+await items.doc(id).update({'title': newTitle,
+    'updatedAt': DateTime.now().millisecondsSinceEpoch});
+
+// D — Delete
+await items.doc(id).delete();
+```
+
+### Firestore Rule
+
+```javascript
+match /users/{uid}/items/{itemId} {
+  allow read, write: if request.auth.uid == uid;
+}
+```
+
+### Key File
+
+`lib/screens/crud_demo_screen.dart` — FAB to create, `StreamBuilder` for live list,
+edit dialog for update, delete confirmation. Access via "My Items (CRUD)" on HomeScreen.
+
+---
+
+---
+
+## Sprint-2: Riverpod State Management (Assignment 3.43)
+
+### Providers Created (`lib/providers/app_providers.dart`)
+
+| Provider | Type | Purpose |
+|----------|------|---------|
+| `authStateProvider` | `StreamProvider<User?>` | Firebase auth state — any widget reacts to login/logout |
+| `counterProvider` | `StateProvider<int>` | Shared counter across screens |
+| `favoritesProvider` | `StateNotifierProvider<List<String>>` | Favorites list with add/remove/toggle |
+| `darkModeProvider` | `StateProvider<bool>` | Theme preference |
+
+### Setup
+
+```dart
+// main.dart — wrap app with ProviderScope
+runApp(const ProviderScope(child: NanheNestApp()));
+```
+
+### Read & Update
+
+```dart
+// StateProvider — read
+final count = ref.watch(counterProvider);
+
+// StateProvider — update
+ref.read(counterProvider.notifier).state++;
+
+// StateNotifierProvider — read
+final favorites = ref.watch(favoritesProvider);
+
+// StateNotifierProvider — update
+ref.read(favoritesProvider.notifier).toggle('Flutter');
+
+// StreamProvider — async value
+final authAsync = ref.watch(authStateProvider);
+authAsync.when(data: (user) => ..., loading: () => ..., error: (e,_) => ...);
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/providers/app_providers.dart` | All Riverpod providers |
+| `lib/screens/riverpod_demo_screen.dart` | 3-tab demo: counter, favorites, auth state |
+
+Access via "Riverpod State" card on HomeScreen.
+
+---
+
+---
+
+## Sprint-2: Complex Forms & Input Validation (Assignment 3.44)
+
+### Validators Implemented (`lib/screens/complex_form_screen.dart`)
+
+| Field | Validation |
+|-------|-----------|
+| Full Name | Required, min 2 chars |
+| Email | Required, regex `^[^@\s]+@[^@\s]+\.[^@\s]+$` |
+| Phone | Required, exactly 10 digits |
+| Bio | Required, max 160 chars |
+| Password | Required, min 8 chars, 1 uppercase, 1 digit |
+| Confirm Password | Cross-field — must match password |
+
+### Key Patterns
+
+```dart
+// GlobalKey for form state
+final _formKey = GlobalKey<FormState>();
+
+// Real-time validation after first submit attempt
+AutovalidateMode _autovalidate = AutovalidateMode.disabled;
+// On submit: setState(() => _autovalidate = AutovalidateMode.onUserInteraction);
+
+// Cross-field validation (confirm password)
+String? _validateConfirm(String? v) {
+  if (v != _passwordCtrl.text) return 'Passwords do not match';
+  return null;
+}
+
+// Phone — digits only input formatter
+FilteringTextInputFormatter.digitsOnly,
+LengthLimitingTextInputFormatter(10),
+
+// Trigger validation on submit
+if (!_formKey.currentState!.validate()) return;
+```
+
+### Key File
+
+`lib/screens/complex_form_screen.dart` — 6-field form with all validator types, success state, and reset. Access via "Complex Form" card on HomeScreen.
+
+---
+## License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.
 
 ---
 
+## Sprint-2: Securing Firebase with Auth & Firestore Rules (Assignment 3.39)
+
+### Security Rules (`firestore.rules`)
+
+All collections are locked down — unauthenticated requests are denied by default.
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Only owner can write their own profile
+    match /users/{uid} {
+      allow read:  if isAuthenticated();
+      allow write: if isOwner(uid);
+    }
+
+    // Posts: any auth user reads/creates, only author updates/deletes
+    match /posts/{postId} {
+      allow read:          if isAuthenticated();
+      allow create:        if isAuthenticated()
+                           && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAuthenticated()
+                           && resource.data.uid == request.auth.uid;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+### Auth-Gated Firestore Access (Flutter)
+
+```dart
+// AuthService.updateUserProfile() — client-side guard mirrors the rule
+final currentUid = FirebaseAuth.instance.currentUser?.uid;
+if (currentUid == null) throw Exception('Not authenticated');
+if (currentUid != uid)  throw Exception('Permission denied');
+
+await FirebaseFirestore.instance
+    .collection('users')
+    .doc(uid)
+    .update({'displayName': displayName});
+// If rules deny → FirebaseException(PERMISSION_DENIED) is thrown
+```
+
+### Deploy Rules
+
+```bash
+firebase deploy --only firestore:rules
+firebase deploy --only firestore:indexes
+```
+
+### Common Issues
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `PERMISSION_DENIED` | Rules block access | Check rules + ensure user is signed in |
+| Writes fail | No login performed | Call `signIn()` before any Firestore write |
+| Open rules in prod | Started in test mode | Replace `if true` with auth checks |
+
+### Reflection
+
+**Why securing Firestore matters** — test mode (`allow read, write: if true`) exposes all data to anyone with the project ID. Production rules ensure only authenticated owners can modify their data.
+
+**How rules + client guards work together** — Firestore rules are the authoritative enforcement layer (server-side). Client-side checks in `AuthService` provide early feedback before the network call, improving UX.
+
+**PERMISSION_DENIED handling** — caught as `FirebaseException` in try/catch blocks, surfaced to the user via SnackBar with a clear message.
+
+---
+
+This section documents structured Firestore queries with `where`, `orderBy`, and `limit`.
+
+### Query Types Implemented
+
+| Query | Code | Purpose |
+|-------|------|---------|
+| Equality filter | `.where('isCompleted', isEqualTo: false)` | Show only incomplete tasks |
+| Order ascending | `.orderBy('title')` | Alphabetical sort |
+| Order descending | `.orderBy('createdAt', descending: true)` | Newest first |
+| Limit | `.limit(10)` | Cap results for performance |
+| Composite | `where + orderBy + limit` | Filtered + sorted + capped |
+
+### Code Snippets
+
+```dart
+// Equality filter + orderBy + limit (composite query)
+FirebaseFirestore.instance
+    .collection('tasks')
+    .where('isCompleted', isEqualTo: false)
+    .orderBy('createdAt', descending: true)
+    .limit(10)
+    .snapshots()
+
+// Sort by title ascending
+FirebaseFirestore.instance
+    .collection('tasks')
+    .orderBy('title')
+    .snapshots()
+
+// Comparison filter
+FirebaseFirestore.instance
+    .collection('tasks')
+    .where('likes', isGreaterThan: 0)
+    .snapshots()
+```
+
+### Dynamic Query Builder
+
+`FirestoreQueryDemoScreen` lets you toggle filters and sort options at runtime — the `StreamBuilder` rebuilds instantly as the query changes. Includes a "Seed Tasks" FAB to populate sample data.
+
+### Index Note
+
+Combining `where()` on one field with `orderBy()` on a different field requires a **composite index** in Firebase Console → Firestore → Indexes. The screen shows a clear error message if an index is missing.
+
+### Key File
+
+`lib/screens/firestore_query_demo_screen.dart` — interactive query builder with live results.
+
+### Reflection
+
+**Why sorting/filtering improves UX** — fetching all documents and filtering in Dart wastes bandwidth and memory. Server-side queries return only what's needed, making the app faster and cheaper to run.
+
+**Query types used** — equality (`isEqualTo`), ordering (`orderBy` asc/desc), and result capping (`limit`). Composite queries combine all three.
+
+**Index errors** — `where` + `orderBy` on different fields requires a composite index. Firebase provides a direct link in the error message to create it in one click.
+
+---
+
+This section documents all three Firestore write operations implemented in NanheNest.
+
+### Write Operations
+
+| Operation | Method | When to use |
+|-----------|--------|-------------|
+| Create | `.collection().add({})` | New document, auto-generated ID |
+| Set (upsert) | `.doc(id).set({}, SetOptions(merge: true))` | Write to known ID, preserve other fields |
+| Update | `.doc(id).update({})` | Modify specific fields only |
+
+### add() — Create New Document
+
+```dart
+await FirebaseFirestore.instance.collection('tasks').add({
+  'title': title,
+  'description': desc,
+  'isCompleted': false,
+  'uid': currentUser.uid,
+  'createdAt': Timestamp.now(),
+  'updatedAt': Timestamp.now(),
+});
+```
+
+### update() — Modify Specific Fields
+
+```dart
+// Toggle completion
+await FirebaseFirestore.instance
+    .collection('tasks')
+    .doc(docId)
+    .update({
+      'isCompleted': !current,
+      'updatedAt': Timestamp.now(),
+    });
+
+// Edit title
+await FirebaseFirestore.instance
+    .collection('tasks')
+    .doc(docId)
+    .update({'title': newTitle, 'updatedAt': Timestamp.now()});
+```
+
+### set(merge: true) — Upsert Without Overwriting
+
+```dart
+await FirebaseFirestore.instance
+    .collection('users')
+    .doc(uid)
+    .set({'lastWriteDemo': Timestamp.now()}, SetOptions(merge: true));
+// Only updates lastWriteDemo — all other fields preserved
+```
+
+### Input Validation
+
+All write operations validate before hitting Firestore:
+- Empty field check → SnackBar error, no write
+- Auth UID attached to every document
+- `updatedAt` timestamp on every mutation
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/screens/firestore_write_demo_screen.dart` | Add form + live list with inline edit/toggle |
+| `lib/services/firestore_service.dart` | `createPost()`, `updatePost()`, `createUserDocument()` |
+| `lib/screens/home/dashboard_screen.dart` | Real-world add/delete on posts |
+
+Access via "Firestore Writes" card on HomeScreen.
+
+### Reflection
+
+**Why secure writes matter** — unvalidated writes can corrupt data, cause crashes in readers, or allow users to overwrite other users' documents. Input validation + Firestore security rules are both required.
+
+**add vs set vs update** — `add()` is for new records with no known ID. `set()` is for known IDs (like user profiles keyed by UID). `update()` is for partial changes — it fails if the document doesn't exist, which is a useful safety net.
+
+**How validation prevents corruption** — checking for empty fields and correct types before writing ensures Firestore never receives malformed data that would break `fromFirestore()` deserialization.
+
+---
+
+This section documents all four Firestore read patterns implemented in NanheNest.
+
+### Read Patterns Implemented
+
+| Pattern | API | Widget | Use Case |
+|---------|-----|--------|----------|
+| Real-time collection stream | `.collection().snapshots()` | `StreamBuilder` | Live post feed |
+| Filtered query stream | `.where().snapshots()` | `StreamBuilder` | My posts only |
+| Single doc one-time read | `.doc().get()` | `FutureBuilder` | Profile snapshot |
+| Single doc real-time stream | `.doc().snapshots()` | `StreamBuilder` | Live profile |
+
+### Real-time Collection Stream
+
+```dart
+StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('posts')
+      .orderBy('createdAt', descending: true)
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const CircularProgressIndicator();
+    }
+    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+      return const Text('No data available');
+    }
+    final docs = snapshot.data!.docs;
+    return ListView.builder(
+      itemCount: docs.length,
+      itemBuilder: (context, i) {
+        final data = docs[i].data() as Map<String, dynamic>;
+        return ListTile(title: Text(data['content'] ?? ''));
+      },
+    );
+  },
+)
+```
+
+### Filtered Query
+
+```dart
+FirebaseFirestore.instance
+    .collection('posts')
+    .where('uid', isEqualTo: currentUser.uid)
+    .orderBy('createdAt', descending: true)
+    .snapshots()
+```
+
+### One-time Document Read (FutureBuilder)
+
+```dart
+FutureBuilder<DocumentSnapshot>(
+  future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) return const CircularProgressIndicator();
+    final data = snapshot.data!.data() as Map<String, dynamic>;
+    return Text('Name: ${data['displayName']}');
+  },
+)
+```
+
+### Key Files
+
+| File | What it demonstrates |
+|------|----------------------|
+| `lib/screens/firestore_read_demo_screen.dart` | All 4 read patterns in a tabbed UI |
+| `lib/screens/home/dashboard_screen.dart` | Real-time feed with `StreamBuilder` |
+| `lib/services/firestore_service.dart` | `getPostsStream()`, `getUserStream()`, `getUserDocument()` |
+
+Access the demo via the "Firestore Reads" card on the HomeScreen.
+
+---
+
+This section documents the Cloud Firestore data model for NanheNest.
+
+### Data Requirements
+
+| # | Data | Collection |
+|---|------|------------|
+| 1 | User profiles | `users/` |
+| 2 | Posts / feed | `posts/` |
+| 3 | Post comments | `posts/{id}/comments/` |
+| 4 | Post likes | `posts/{id}/likes/` |
+| 5 | Community events | `events/` |
+
+### Schema Overview
+
+```
+Firestore Root
+├── users/{uid}
+│   ├── email, displayName, avatarUrl, bio
+│   ├── postCount, followerCount, followingCount
+│   ├── fcmToken, createdAt, lastActive
+│
+├── posts/{postId}
+│   ├── uid, displayName (denormalized), content, imageUrl
+│   ├── likes (counter), comments (counter)
+│   ├── createdAt, updatedAt
+│   ├── comments/{commentId}
+│   │   └── uid, displayName, text, createdAt
+│   └── likes/{uid}
+│       └── createdAt
+│
+└── events/{eventId}
+    ├── creatorUid, title, description
+    ├── location (GeoPoint), address
+    ├── eventDateTime, imageUrl
+    ├── attendees (array<string>), isActive
+    └── createdAt
+```
+
+Full schema with sample documents and diagram: [`docs/firestore_schema.md`](docs/firestore_schema.md)
+
+### Key Design Decisions
+
+- `posts/` is top-level (not under `users/`) so the global feed can be queried in a single call
+- `comments/` and `likes/` are subcollections — they can grow large and shouldn't be loaded with the feed card
+- `likes/{uid}` uses the liker's UID as the document ID — naturally prevents duplicate likes
+- `displayName` is denormalized onto posts to avoid extra reads when rendering the feed
+
+### Reflection
+
+**Why this structure?**
+It mirrors how the data is actually accessed — feed queries need all posts, not per-user. Subcollections for comments/likes keep the post document small and fast to load.
+
+**How does this help performance?**
+Firestore charges per document read. Keeping the post document lean (no embedded comment arrays) means the feed loads quickly and cheaply. Subcollections are only fetched when the user opens a specific post.
+
+**Challenges?**
+The main tradeoff was deciding between `attendees` as an array vs a subcollection for events. An array is simpler at current scale; a subcollection would be needed if events grow to thousands of attendees.
+
+---
+
+This section documents persistent user session handling using Firebase Auth's built-in token persistence.
+
+### How Firebase Session Persistence Works
+
+Firebase Auth automatically stores a secure token on the device after login. On every app restart, it checks this token silently in the background. As a developer, you only need to react to the stream — no `SharedPreferences` or manual token storage required.
+
+```
+App opens
+    │
+    ▼
+Firebase checks stored token  ← SplashScreen shown during this
+    │
+    ├── Token valid   → HomeScreen  (auto-login, no credentials needed)
+    ├── Token absent  → AuthScreen  (user must sign in)
+    └── Token expired → AuthScreen  (Firebase invalidates automatically)
+```
+
+### AuthGate with SplashScreen
+
+```dart
+// lib/main.dart
+StreamBuilder<User?>(
+  stream: AuthService().authStateChanges(),
+  builder: (context, snapshot) {
+    // Firebase checking persisted token → show branded splash
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const SplashScreen();
+    }
+    // Valid session → skip login entirely
+    if (snapshot.hasData) {
+      return const HomeScreen();
+    }
+    // No session → login required
+    return const AuthScreen();
+  },
+)
+```
+
+### SplashScreen (`lib/screens/splash_screen.dart`)
+
+Shown while Firebase verifies the stored session token. Replaces the bare `CircularProgressIndicator` with a branded loading experience.
+
+### Auto-Login Flow
+
+1. User logs in → Firebase stores token on device
+2. User closes app
+3. User reopens app → `authStateChanges()` emits the stored `User`
+4. `AuthGate` rebuilds → `HomeScreen` shown immediately, no login prompt
+
+### Logout Flow
+
+```dart
+await AuthService().signOut();
+// Firebase clears the stored token
+// authStateChanges() emits null
+// AuthGate rebuilds → AuthScreen shown
+```
+
+### Token Lifecycle
+
+| Event | Token State | App Behaviour |
+|-------|-------------|---------------|
+| Login / Signup | Stored on device | HomeScreen |
+| App restart | Auto-refreshed by Firebase | HomeScreen (auto-login) |
+| Logout | Cleared | AuthScreen |
+| Password changed elsewhere | Invalidated | AuthScreen |
+| App data cleared | Removed | AuthScreen |
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/main.dart` | `AuthGate` with `SplashScreen` during waiting state |
+| `lib/screens/splash_screen.dart` | Branded loading screen shown on app start |
+| `lib/services/auth_service.dart` | `authStateChanges()` stream wrapper |
+
+### Reflection
+
+**Why is persistent login essential?**
+Requiring users to log in every time they open an app is a major UX friction point. Persistent sessions keep users engaged and mirror the behaviour they expect from every modern app.
+
+**How does Firebase make session handling easy?**
+Firebase handles token storage, refresh, and invalidation entirely. The developer only needs one `StreamBuilder` — no manual token management, no `SharedPreferences`, no expiry logic.
+
+**Issues faced while testing auto-login?**
+The main gotcha is the `ConnectionState.waiting` flash — without a `SplashScreen`, the app briefly shows the login screen before the token check completes, even when the user is already logged in. The `SplashScreen` eliminates this flicker entirely.
+
+---
+
+This section documents the complete authentication flow — signup, login, and logout — with seamless screen transitions driven by `authStateChanges()`.
+
+### How It Works
+
+```
+App Launch
+    │
+    ▼
+AuthGate — StreamBuilder<User?>(stream: authStateChanges())
+    │
+    ├── ConnectionState.waiting  → Loading spinner
+    ├── snapshot.hasData (User)  → HomeScreen  (logged in)
+    └── snapshot.data == null    → AuthScreen  (logged out)
+```
+
+No manual `Navigator.push` needed. Firebase's auth stream drives all navigation automatically.
+
+### Sign Up Logic
+
+```dart
+// AuthScreen calls AuthService.signUp()
+await _authService.signUp(
+  email: _emailController.text.trim(),
+  password: _passwordController.text,
+  displayName: _nameController.text.trim(),
+);
+// authStateChanges() emits User → AuthGate rebuilds → HomeScreen shown
+```
+
+### Login Logic
+
+```dart
+// AuthScreen calls AuthService.signIn()
+await _authService.signIn(
+  email: _emailController.text.trim(),
+  password: _passwordController.text,
+);
+// authStateChanges() emits User → AuthGate rebuilds → HomeScreen shown
+```
+
+### Logout Logic
+
+```dart
+// HomeScreen logout button calls AuthService.signOut()
+await AuthService().signOut();
+// authStateChanges() emits null → AuthGate rebuilds → AuthScreen shown
+```
+
+### authStateChanges() — Why It Matters
+
+`FirebaseAuth.instance.authStateChanges()` returns a `Stream<User?>` that emits:
+- A `User` object when a session is active (login/signup)
+- `null` when the session ends (logout or app restart with no session)
+
+Wrapping the root widget in a `StreamBuilder` on this stream means the app reacts to auth changes instantly — no manual routing, no flicker.
+
+```dart
+// lib/main.dart — AuthGate
+StreamBuilder<User?>(
+  stream: AuthService().authStateChanges(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (snapshot.hasData) return const HomeScreen();
+    return const AuthScreen();
+  },
+)
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/main.dart` | `AuthGate` — StreamBuilder routing |
+| `lib/screens/auth/auth_screen.dart` | Combined login/signup toggle screen |
+| `lib/screens/home/home_screen.dart` | Post-login screen with logout button |
+| `lib/services/auth_service.dart` | `signIn`, `signUp`, `signOut`, `authStateChanges()` |
+
+### Reflection
+
+**Hardest part of building the flow?**
+Ensuring the `ConnectionState.waiting` case was handled so the app doesn't flash the login screen for a split second on restart when a session already exists.
+
+**How does StreamBuilder simplify navigation?**
+It eliminates all manual `Navigator.push/pop` calls for auth transitions. The stream is the single source of truth — when auth state changes, the UI rebuilds automatically.
+
+**Why is logout essential for session security?**
+Without explicit logout, Firebase persists the session token indefinitely. Logout clears the token, ensuring the next user of the device can't access the previous user's account.
+
+---
+
+This section documents the implementation of **Firebase Authentication with Email & Password** as required by the Sprint-2 assignment.
+
+### What Was Implemented
+
+Firebase Authentication with Email & Password is fully integrated into NanheNest. Users can register new accounts, log in securely, and the app automatically manages session state — all backed by Firebase's authentication infrastructure.
+
+### Authentication Flow Summary
+
+```
+App Launch
+    │
+    ▼
+FirebaseBootstrap.initialize()   ← Firebase initialized before runApp()
+    │
+    ▼
+AuthGate (StreamBuilder on authStateChanges)
+    │
+    ├── User signed in  → DashboardScreen
+    └── User signed out → LoginScreen ⇄ SignUpScreen
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lib/services/auth_service.dart` | All Firebase Auth operations |
+| `lib/screens/auth/auth_screen.dart` | Combined login/signup toggle screen |
+| `lib/screens/auth/login_screen.dart` | Dedicated login screen with validation |
+| `lib/screens/auth/signup_screen.dart` | Dedicated signup screen with validation |
+| `lib/screens/home/dashboard_screen.dart` | Post-login screen with logout |
+| `lib/core/config/firebase_bootstrap.dart` | Firebase initialization wrapper |
+| `lib/main.dart` | AuthGate — auth-state-driven routing |
+
+### Signup Logic
+
+```dart
+// lib/services/auth_service.dart
+Future<UserCredential> signUp({
+  required String email,
+  required String password,
+  required String displayName,
+}) async {
+  final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+
+  // Automatically create Firestore user document on signup
+  await _firebaseFirestore
+      .collection('users')
+      .doc(userCredential.user!.uid)
+      .set(UserModel(...).toMap());
+
+  return userCredential;
+}
+```
+
+### Login Logic
+
+```dart
+// lib/services/auth_service.dart
+Future<UserCredential> signIn({
+  required String email,
+  required String password,
+}) async {
+  return await _firebaseAuth.signInWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+}
+```
+
+### Auth State Listener (Session Persistence)
+
+```dart
+// lib/main.dart — AuthGate widget
+StreamBuilder<User?>(
+  stream: _authService.authStateChanges(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (snapshot.hasData) {
+      return const DashboardScreen(); // logged in
+    }
+    return LoginScreen(onSignUpTap: _toggleAuthScreen); // logged out
+  },
+)
+```
+
+### Logout
+
+```dart
+// lib/screens/home/dashboard_screen.dart
+await _authService.signOut();
+// AuthGate's StreamBuilder automatically navigates back to LoginScreen
+```
+
+### Error Handling
+
+Firebase Auth exceptions are mapped to user-friendly messages in `AuthService._handleAuthException()`:
+
+| Firebase Error Code | User-Facing Message |
+|---------------------|---------------------|
+| `weak-password` | The password provided is too weak. |
+| `email-already-in-use` | An account already exists for that email. |
+| `invalid-email` | The email address is not valid. |
+| `user-not-found` | No user found for that email. |
+| `wrong-password` | Wrong password provided. |
+| `invalid-credential` | Invalid email or password. |
+| `user-disabled` | The user account has been disabled. |
+
+### Firebase Console Verification
+
+After a successful signup or login:
+1. Open [Firebase Console](https://console.firebase.google.com)
+2. Navigate to **Authentication → Users**
+3. The registered user's email appears in the table with UID and creation date
+
+### Dependencies (pubspec.yaml)
+
+```yaml
+dependencies:
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.11.0
+  cloud_firestore: ^4.14.0
+```
+
+### Reflection
+
+**How does Firebase simplify authentication management?**
+Firebase handles token generation, session persistence, secure password hashing, and email verification out of the box. Without Firebase, you'd need to build and maintain a custom auth backend, manage JWT tokens, and handle security vulnerabilities yourself.
+
+**What security features make it better than custom auth systems?**
+Firebase Auth uses industry-standard OAuth 2.0 and OpenID Connect protocols, stores passwords with bcrypt hashing, provides automatic token refresh, and enforces rate limiting on login attempts — all without any configuration.
+
+**What challenges were faced?**
+The main challenge was ensuring the `FirebaseAuthException` error codes were properly mapped to user-friendly messages, and making sure the `AuthGate` `StreamBuilder` correctly handled the `ConnectionState.waiting` state to avoid flashing the login screen on app restart when a session already exists.
+
+---
+
+## Concept 3.36: Firebase Storage — Upload & Manage Media
+
+This section documents the implementation of **Concept 3.36**, which focuses on integrating Firebase Storage for robust media upload and management in NanheNest.
+
+### Overview
+
+Concept 3.36 implements a scalable and bug-free Firebase Storage layer that allows users to seamlessly upload avatars, posts, and chat media.
+
+### Key Implemented Features
+
+1. **Storage Layer Built (`StorageService`)**
+   - Implemented a clean, strongly typed `StorageService` using the singleton pattern.
+   - Segregated upload methods: `uploadUserAvatar()`, `uploadPostImage()`, `uploadEventImage()`, and `uploadChatMedia()`.
+   - Mapped Firebase Storage error codes to a typed enum `StorageExceptionType` for UI feedback.
+   - Built-in cancellation support via `UploadTask.cancel()`.
+   - Real-time progress tracking `onProgress(double)`.
+   - Automated path extensions scaling (e.g. `avatars/{userId}/profile.jpg`, `posts/{postId}/{timestamp}.{ext}`).
+
+2. **Media Picker Integration (`MediaPickerUtil`)**
+   - Safe abstraction over the `image_picker` package supporting both Camera and Gallery images.
+   - Guaranteed null-safe file picking gracefully handling user cancellation.
+
+3. **Client-Side Validation & Compression**
+   - Explicit file existence and extension (`jpg`, `png`, `webp`, `heic`, etc.) verification.
+   - Size limit bound assertions prior to attempting any network operation.
+   - Automated `flutter_image_compress` integration converting large native photos into bandwidth-friendly versions (< 500KB) transparently.
+
+4. **UI Integration (`CreatePostScreen` & `EditProfileScreen`)**
+   - Visual upload progress bar overlays mapped flawlessly to the Storage Stream events.
+   - Error handling rendering localized inline errors without crashing.
+   - Complete logical decouple between the core Firebase components and widgets.
+   - Fallback rendering UI correctly switching between offline file previews and Network Cached Images.
+
+### Bug Fixes Implemented
+
+- **Path Extension Edge-Case Resolution**: Solved a critical latent bug occurring on dynamic OS environments where directory names cache paths holding dot notations (`.`) resulted in the file extension validator failing erroneously. Evaluated the proper path substring strategy ensuring robust hardware support. 
+
+### Learning Outcomes
+
+1. **Upload Reliability**: Managing asynchronous streaming connections under varied network topologies.
+2. **Bandwidth Optimization**: The pivotal role of local Client-Side Image Preprocessing.
+3. **Decoupled Scoping**: Separation of Concerns structuring `Service` completely independent of `Widget`.
+
+---
+
+## Concept 3.37: Cloud Functions for Serverless Events
+
+This section documents the implementation of **Concept 3.37**, delivering a production-grade Cloud Functions backend to safely automate event-driven serverless logic within the application.
+
+### Overview
+
+Concept 3.37 expands the architectural capability by providing off-client automation, specifically designed to handle background notification generations securely without adding workload blocking onto the user experiences on mobile.
+
+### Key Implemented Features
+
+1. **Trigger Hooks Architecture (`functions/src/triggers/`)**
+   - Implemented discrete, decoupled triggers listening strictly on backend event creations targeting paths `likes/{likeId}`, `comments/{commentId}`, and `messages/{messageId}`.
+   - Built to immediately extract relevant context silently processing logic post-event.
+
+2. **Idempotency & Duplicate Guards (`createIdempotentNotification`)**
+   - Engineered scalable notification identifiers tying the resultant notification outputs to deterministic identifiers (`like_{likeId}`, `message_{messageId}`).
+   - Proactive Cloud Function `doc().get().exists` verification blocking redundant duplicate data overriding caused by inherent serverless retried execution environments.
+
+3. **Strong Typing Implementations (`functions/src/types/`)**
+   - Eliminated `any` vulnerabilities by implementing strict formatting definitions for `MessageDocument`, `CommentDocument`, `LikeDocument`, and `NotificationPayload`.
+   - Hardened parsing logic ensuring unknown anomalies are rejected quietly bypassing infinite loops.
+
+4. **Event Safety Guardrails**
+   - Automated separation of document target origins preventing accidental self-notification pingbacks (i.e. guarding instances where a user likes their own post or chats with themselves).
+   - Ensured outputs are securely written into independent `notifications` collections strictly to bypass triggering infinite nested Firestore write loops.
+
+
+## Concept 3.38: Push Notifications via Firebase Cloud Messaging
+
+This section documents the implementation of **Concept 3.38**, integrating Firebase Cloud Messaging (FCM) for production-grade push notification support across all app states.
+
+### Overview
+
+Concept 3.38 delivers a complete push notification pipeline — from device token management through foreground/background/terminated-state handling to safe notification tap routing — encapsulated in a singleton `NotificationService`.
+
+### Key Implemented Features
+
+1. **`NotificationService` Singleton (`lib/services/notification_service.dart`)**
+   - Manages the full FCM lifecycle: initialization, permissions, token retrieval, message listeners, and tap handling.
+   - Idempotent — safe to call `initialize()` multiple times without duplicate listener registration.
+
+2. **Permission Handling**
+   - Requests notification permissions on both iOS and Android 13+ using `FirebaseMessaging.requestPermission()`.
+   - Gracefully handles denied/provisional states without crashing app startup.
+
+3. **Device Token Management**
+   - Retrieves FCM token at startup and listens for `onTokenRefresh` events.
+   - Token is exposed via `getToken()` and ready for Firestore backend sync.
+
+4. **Foreground Notification Rendering**
+   - Uses `flutter_local_notifications` to display heads-up banners when FCM messages arrive while the app is open.
+   - Dedicated Android high-importance notification channel (`connecthub_high_importance`).
+
+5. **Background & Terminated-State Handling**
+   - Top-level `@pragma('vm:entry-point')` background handler registered via `FirebaseMessaging.onBackgroundMessage()`.
+   - `getInitialMessage()` captures notifications that launched the app from a terminated state.
+
+6. **Notification Tap Routing**
+   - `NotificationPayload` model safely parses FCM data payloads with typed fields (`type`, `postId`, `chatId`, `senderId`).
+   - `main.dart` wires a global `navigatorKey` to route taps to the correct screen (`dashboard` for likes/comments, `realtimeChatList` for messages).
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `lib/services/notification_service.dart` | Full FCM + local notification lifecycle |
+| `lib/main.dart` | Initialization site + tap routing via `navigatorKey` |
+
+### Dependencies
+
+```yaml
+firebase_messaging: ^14.7.0
+flutter_local_notifications: ^16.1.0
+```
+
+
+---
+
 <div align="center">
 
-Made with ❤️ by Team NanheNest — Sprint #2, March 2026
+Made by Team NanheNest — Sprint #2, March 2026
 
 </div>
