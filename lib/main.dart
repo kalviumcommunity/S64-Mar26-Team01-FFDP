@@ -7,28 +7,38 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home/dashboard_screen.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/router.dart';
 import 'config/theme.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const NanheNestApp());
+  runApp(
+    // ProviderScope is required for Riverpod to store its state
+    const ProviderScope(
+      child: NanheNestApp(),
+    ),
+  );
 }
 
-class NanheNestApp extends StatelessWidget {
+class NanheNestApp extends ConsumerWidget {
   const NanheNestApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the theme state
+    final themeMode = ref.watch(themeProvider);
+
     return MaterialApp.router(
       title: 'NanheNest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: AppRouter.router,
     );
   }
