@@ -24,6 +24,9 @@ class AppTheme {
   // --- Light Theme ---
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF6750A4),
+      brightness: Brightness.light,
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
       primary:                Color(0xFF6750A4),
@@ -49,6 +52,13 @@ class AppTheme {
       centerTitle: true,
       elevation: 0,
       scrolledUnderElevation: 1,
+    ),
+    cardTheme: CardTheme(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFE7E0EC)),
+      ),
       backgroundColor: Color(0xFFFFFBFE),
       foregroundColor: Color(0xFF1C1B1F),
     ),
@@ -64,6 +74,9 @@ class AppTheme {
   // --- Dark Theme ---
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFFD0BCFF),
+      brightness: Brightness.dark,
     brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
       primary:                Color(0xFFD0BCFF),
@@ -87,9 +100,13 @@ class AppTheme {
       centerTitle: true,
       elevation: 0,
       scrolledUnderElevation: 1,
-      backgroundColor: Color(0xFF1C1B1F),
-      foregroundColor: Color(0xFFE6E1E5),
     ),
+    cardTheme: CardTheme(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFF49454F)),
+      ),
     cardTheme: CardThemeData(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
