@@ -19,6 +19,7 @@ import '../screens/firestore_write_demo_screen.dart';
 import '../screens/firestore_query_demo_screen.dart';
 import '../screens/crud_demo_screen.dart';
 import '../screens/maps/map_screen.dart';
+import '../screens/complex_form_screen.dart';
 import '../screens/riverpod_demo_screen.dart';
 
 /// Centralized named route definitions for NanheNest.
@@ -51,6 +52,7 @@ class AppRoutes {
   static const String firestoreQueryDemo = '/firestore-query-demo';
   static const String crudDemo = '/crud-demo';
   static const String map = '/map';
+  static const String complexForm = '/complex-form';
   static const String riverpodDemo = '/riverpod-demo';
 
   /// All named routes registered in MaterialApp
@@ -79,6 +81,7 @@ class AppRoutes {
         firestoreQueryDemo: (_) => const FirestoreQueryDemoScreen(),
         crudDemo: (_) => const CrudDemoScreen(),
         map: (_) => const MapScreen(),
+        complexForm: (_) => const ComplexFormScreen(),
         riverpodDemo: (_) => const RiverpodDemoScreen(),
       };
 }
