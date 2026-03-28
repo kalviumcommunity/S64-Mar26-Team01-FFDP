@@ -1851,6 +1851,51 @@ authAsync.when(data: (user) => ..., loading: () => ..., error: (e,_) => ...);
 Access via "Riverpod State" card on HomeScreen.
 
 ---
+
+---
+
+## Sprint-2: Complex Forms & Input Validation (Assignment 3.44)
+
+### Validators Implemented (`lib/screens/complex_form_screen.dart`)
+
+| Field | Validation |
+|-------|-----------|
+| Full Name | Required, min 2 chars |
+| Email | Required, regex `^[^@\s]+@[^@\s]+\.[^@\s]+$` |
+| Phone | Required, exactly 10 digits |
+| Bio | Required, max 160 chars |
+| Password | Required, min 8 chars, 1 uppercase, 1 digit |
+| Confirm Password | Cross-field — must match password |
+
+### Key Patterns
+
+```dart
+// GlobalKey for form state
+final _formKey = GlobalKey<FormState>();
+
+// Real-time validation after first submit attempt
+AutovalidateMode _autovalidate = AutovalidateMode.disabled;
+// On submit: setState(() => _autovalidate = AutovalidateMode.onUserInteraction);
+
+// Cross-field validation (confirm password)
+String? _validateConfirm(String? v) {
+  if (v != _passwordCtrl.text) return 'Passwords do not match';
+  return null;
+}
+
+// Phone — digits only input formatter
+FilteringTextInputFormatter.digitsOnly,
+LengthLimitingTextInputFormatter(10),
+
+// Trigger validation on submit
+if (!_formKey.currentState!.validate()) return;
+```
+
+### Key File
+
+`lib/screens/complex_form_screen.dart` — 6-field form with all validator types, success state, and reset. Access via "Complex Form" card on HomeScreen.
+
+---
 ## License
 
 This project was developed as part of **Kalvium Sprint #2**. All rights reserved by the NanheNest team.

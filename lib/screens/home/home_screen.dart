@@ -180,6 +180,14 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.riverpodDemo),
                     ),
+                    _NavCard(
+                      icon: Icons.assignment_outlined,
+                      label: 'Complex Form',
+                      description: 'Multi-field validation demo',
+                      color: Colors.brown,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.complexForm),
+                    ),
                   ],
                 ),
               ),
