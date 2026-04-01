@@ -1,4 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../screens/main_scaffold.dart';
 import '../screens/home/dashboard_screen.dart';
 import '../screens/auth/login_screen.dart';
@@ -14,16 +15,14 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     navigatorKey: rootNavigatorKey,
     redirect: (context, state) {
-      final loggedIn = FirebaseAuth.instance.currentUser != null;
-      final isLoggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/signup';
-
-      if (!loggedIn && !isLoggingIn) return '/login';
-      if (loggedIn && isLoggingIn) return '/';
+      // Mocking Auth for frontend UI building
+      // Change to bypass login redirection so we can see screens
       return null;
     },
+    routes: [
       // Auth Routes
       GoRoute(
         path: '/login',

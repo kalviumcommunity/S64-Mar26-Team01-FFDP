@@ -7,9 +7,9 @@ class SignUpScreen extends StatefulWidget {
   final VoidCallback onLoginTap;
 
   const SignUpScreen({
-    Key? key,
+    super.key,
     required this.onLoginTap,
-  }) : super(key: key);
+  });
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();

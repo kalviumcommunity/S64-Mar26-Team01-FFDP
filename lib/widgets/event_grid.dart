@@ -7,9 +7,9 @@ class EventGrid extends StatelessWidget {
   final int eventCount;
 
   const EventGrid({
-    Key? key,
+    super.key,
     this.eventCount = 12, // Default to generating 12 dummy events
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

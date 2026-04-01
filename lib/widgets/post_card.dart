@@ -96,11 +96,11 @@ class PostCard extends StatelessWidget {
                   height: 200,
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     child: const Center(child: CircularProgressIndicator()),
                   ),
                   errorWidget: (context, url, error) => Container(
-                    color: theme.colorScheme.surfaceVariant,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     child: const Icon(Icons.error),
                   ),
                 ),

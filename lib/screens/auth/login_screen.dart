@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/custom_text_field.dart';
-import '../../widgets/primary_button.dart';
+import '../../widgets/styled/glass_morphism.dart';
+import '../../widgets/styled/gradient_background.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onSignUpTap;
 
   const LoginScreen({
-    Key? key,
+    super.key,
     required this.onSignUpTap,
-  }) : super(key: key);
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
@@ -32,200 +32,199 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      try {
-        await _authService.signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login successful!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-      } on Exception catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
-      }
-    }
-  }
-
-  Future<void> _handleForgotPassword() async {
-    if (_emailController.text.isEmpty) {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter your email address'),
-        ),
+        const SnackBar(content: Text('Please fill all fields')),
       );
       return;
     }
+    setState(() => _isLoading = true);
 
-    try {
-      await _authService.resetPassword(_emailController.text.trim());
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password reset email sent'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } on Exception catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    // Mock Login for Frontend UI Testing
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      setState(() => _isLoading = false);
+      // Navigate to Home screen
+      context.go('/');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
+      resizeToAvoidBottomInset:
+          false, // Disables keyboard resizing to prevent yellow/black strips
+      body: Stack(
+        children: [
+          // Theme Background
+          const GradientBackground(child: SizedBox.expand()),
+
+          // Non-scrollable content filling screen flex height
+          SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Header
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome Back',
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Sign in to your NanheNest account',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey[600],
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
+                Spacer(flex: 3), // Dynamic top spacing
 
-                // Email Field
-                CustomTextField(
-                  label: 'Email Address',
-                  hintText: 'Enter your email',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Email is required';
-                    }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                // Password Field
-                CustomTextField(
-                  label: 'Password',
-                  hintText: 'Enter your password',
-                  controller: _passwordController,
-                  isPassword: _obscurePassword,
-                  prefixIcon: Icons.lock_outline,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() => _obscurePassword = !_obscurePassword);
-                    },
-                  ),
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Password is required';
-                    }
-                    if (value!.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: _handleForgotPassword,
-                    child: const Text('Forgot Password?'),
+                // Image / Portrait replacing logo_white with logo
+                Flexible(
+                  flex: 5,
+                  child: Image.asset(
+                    'public/logo.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 24),
 
-                // Login Button
-                PrimaryButton(
-                  label: 'Sign In',
-                  isLoading: _isLoading,
-                  icon: Icons.login,
-                  onPressed: _isLoading ? null : _handleLogin,
-                ),
-                const SizedBox(height: 16),
+                Spacer(flex: 2), // Dynamic mid spacing
 
-                // Sign Up Link
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      TextButton(
-                        onPressed: widget.onSignUpTap,
-                        child: Text(
-                          'Sign Up',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                // Bottom layout Container (No Expandeds needed, takes natural height at bottom)
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFFF98E9B)
+                            .withOpacity(0.0), // Transparent top edge
+                        const Color(0xFFE56A7A)
+                            .withOpacity(0.9), // Strong theme pink blur
+                      ],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const SizedBox(height: 20),
+                        // Title Text matching "Welcome to Filo!" aesthetics
+                        RichText(
+                          text: const TextSpan(
+                            style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                            children: [
+                              TextSpan(text: 'Welcome to '),
+                              TextSpan(
+                                  text: 'NanheNest',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: '!'),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 40),
+                          child: Text(
+                            'Sign in to your account. Stay connected with the community and track your journey.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white70,
+                                height: 1.4),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Input Fields wrapped in transparent style to match glass effect
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(
+                                  0.2), // Very subtle white underlay
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: TextField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: const InputDecoration(
+                                hintText: 'Email Address',
+                                hintStyle: TextStyle(color: Colors.white70),
+                                prefixIcon: Icon(Icons.email_outlined,
+                                    color: Colors.white),
+                                border: InputBorder.none,
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 18),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: TextField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                hintText: 'Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: Colors.white),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.white70,
+                                  ),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Two Buttons stacked like the picture
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : GlassButton(
+                                  text: 'Sign In',
+                                  isPrimary:
+                                      true, // White solid background with colored text
+                                  onPressed: _handleLogin,
+                                ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: GlassButton(
+                            text: 'Create new account',
+                            isPrimary:
+                                false, // Transparent outline glass button
+                            onPressed: widget.onSignUpTap,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }

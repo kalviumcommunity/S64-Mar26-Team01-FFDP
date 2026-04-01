@@ -11,11 +11,11 @@ class StatelessAvatar extends StatelessWidget {
   final String fallbackInitials;
 
   const StatelessAvatar({
-    Key? key,
+    super.key,
     this.imageUrl,
     this.size = 40.0,
     required this.fallbackInitials,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

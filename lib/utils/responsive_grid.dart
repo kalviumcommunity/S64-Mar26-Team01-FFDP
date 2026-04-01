@@ -10,12 +10,12 @@ class ResponsiveGrid extends StatelessWidget {
   final double runSpacing;
 
   const ResponsiveGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.breakpoint = 600.0, // Standard tablet breakpoint
     this.spacing = 16.0,
     this.runSpacing = 16.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

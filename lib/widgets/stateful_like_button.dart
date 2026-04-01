@@ -10,10 +10,10 @@ class StatefulLikeButton extends StatefulWidget {
   final Function(bool)? onToggle;
 
   const StatefulLikeButton({
-    Key? key,
+    super.key,
     this.initialIsLiked = false,
     this.onToggle,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulLikeButton> createState() => _StatefulLikeButtonState();

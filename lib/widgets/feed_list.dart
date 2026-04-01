@@ -9,9 +9,9 @@ class FeedList extends StatelessWidget {
   final int itemCount;
 
   const FeedList({
-    Key? key,
+    super.key,
     this.itemCount = 20, // Default to generating 20 dummy posts
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

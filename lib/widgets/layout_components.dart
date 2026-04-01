@@ -9,12 +9,12 @@ class AppCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const AppCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding = const EdgeInsets.all(16.0),
     this.margin = const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0.0),
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +50,10 @@ class PageContentWrapper extends StatelessWidget {
   final double horizontalPadding;
   
   const PageContentWrapper({
-    Key? key,
+    super.key,
     required this.child,
     this.horizontalPadding = 16.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

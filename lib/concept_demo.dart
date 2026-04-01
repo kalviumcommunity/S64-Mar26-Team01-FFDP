@@ -5,7 +5,7 @@ void main() {
 }
 
 class ReactiveUIDemoApp extends StatelessWidget {
-  const ReactiveUIDemoApp({Key? key}) : super(key: key);
+  const ReactiveUIDemoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class ReactiveUIDemoApp extends StatelessWidget {
 }
 
 class CounterScreen extends StatefulWidget {
-  const CounterScreen({Key? key}) : super(key: key);
+  const CounterScreen({super.key});
 
   @override
   State<CounterScreen> createState() => _CounterScreenState();
