@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Centralized Theme Configuration for NanheNest using Material 3.
+/// Centralized Theme Configuration for the application using Material 3.
+/// This ensures consistent colors, typography, and component styling
+/// across all screens.
 class AppTheme {
   // --- Typography ---
   static const TextTheme _textTheme = TextTheme(
@@ -58,10 +60,11 @@ class AppTheme {
       scrolledUnderElevation: 1,
     ),
     cardTheme: CardThemeData(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: const Color(0xFFFFFBFE),
-      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFE7E0EC)),
+      ),
     ),
   );
 
@@ -93,10 +96,11 @@ class AppTheme {
       scrolledUnderElevation: 1,
     ),
     cardTheme: CardThemeData(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: const Color(0xFF1C1B1F),
-      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFF49454F)),
+      ),
     ),
   );
 }

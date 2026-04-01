@@ -16,7 +16,7 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     navigatorKey: rootNavigatorKey,
     redirect: (context, state) {
       final loggedIn = FirebaseAuth.instance.currentUser != null;
