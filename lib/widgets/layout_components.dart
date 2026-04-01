@@ -19,7 +19,7 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // We use a Material widget to enable crisp InkWell ripple effects
     // if the card is meant to be tappable.
     return Padding(
@@ -30,7 +30,8 @@ class AppCard extends StatelessWidget {
         // Subtle elevation mimicking a slight lift off the background
         elevation: 1,
         shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
-        clipBehavior: Clip.antiAlias, // Ensures child ink ripples don't bleed out
+        clipBehavior:
+            Clip.antiAlias, // Ensures child ink ripples don't bleed out
         child: InkWell(
           onTap: onTap,
           child: Padding(
@@ -48,7 +49,7 @@ class AppCard extends StatelessWidget {
 class PageContentWrapper extends StatelessWidget {
   final Widget child;
   final double horizontalPadding;
-  
+
   const PageContentWrapper({
     super.key,
     required this.child,

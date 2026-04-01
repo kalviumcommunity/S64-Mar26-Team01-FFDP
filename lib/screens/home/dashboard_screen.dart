@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/post_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
 
@@ -116,6 +116,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.animation),
+            onPressed: () => Navigator.pushNamed(context, '/animation-demo'),
+            tooltip: 'Animations Demo',
+          ),
+          IconButton(
+            icon: const Icon(Icons.analytics),
+            onPressed: () =>
+                Navigator.pushNamed(context, '/state-management-demo'),
+            tooltip: 'State Management Demo',
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _handleLogout,
             tooltip: 'Logout',
@@ -135,9 +146,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     Text(
                       'Welcome, ${user.displayName ?? 'User'}',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -220,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 12),
 
             // Firestore Stream Builder
-            StreamBuilder<List<Map<String, dynamic>>>(
+            StreamBuilder<List<PostModel>>(
               stream: _firestoreService.getPostsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -242,12 +254,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'No posts yet',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                         ),
                       ],
                     ),
@@ -261,8 +271,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     final post = posts[index];
-                    final createdAt = (post['createdAt'] as Timestamp).toDate();
-                    final isOwner = user?.uid == post['uid'];
+                    final createdAt = post.createdAt;
+                    final isOwner = user?.uid == post.uid;
 
                     return Card(
                       margin: const EdgeInsets.symmetric(
@@ -276,14 +286,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             // Post Header
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      post['displayName'] ?? 'Anonymous',
+                                      post.displayName,
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleSmall
@@ -309,7 +318,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       PopupMenuItem(
                                         child: const Text('Delete'),
                                         onTap: () => _handleDeletePost(
-                                          post['id'],
+                                          post.postId,
                                         ),
                                       ),
                                     ],
@@ -320,9 +329,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                             // Post Content
                             Text(
-                              post['content'] ?? '',
-                              style:
-                                  Theme.of(context).textTheme.bodyMedium,
+                              post.content,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 16),
 
@@ -336,10 +344,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${post['likes'] ?? 0} Likes',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall,
+                                  '${post.likes} Likes',
+                                  style: Theme.of(context).textTheme.labelSmall,
                                 ),
                                 const SizedBox(width: 16),
                                 Icon(
@@ -349,10 +355,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${post['comments'] ?? 0} Comments',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall,
+                                  '${post.comments} Comments',
+                                  style: Theme.of(context).textTheme.labelSmall,
                                 ),
                               ],
                             ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 /// CHOICE: StatelessWidget
-/// RATIONALE: This widget is a pure presentational component. It takes data 
-/// (imageUrl and size) and renders it. Since the data is passed from a 
-/// parent and doesn't change internally, a StatelessWidget is the most 
+/// RATIONALE: This widget is a pure presentational component. It takes data
+/// (imageUrl and size) and renders it. Since the data is passed from a
+/// parent and doesn't change internally, a StatelessWidget is the most
 /// performance-efficient choice.
 class StatelessAvatar extends StatelessWidget {
   final String? imageUrl;

@@ -46,7 +46,10 @@ class CustomTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             filled: true,
             // Uses Material 3 color roles for subtle surface layering
-            fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            fillColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -70,7 +73,8 @@ class CustomTextField extends StatelessWidget {
                 color: Theme.of(context).colorScheme.error,
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
       ],

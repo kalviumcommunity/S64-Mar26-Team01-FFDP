@@ -28,7 +28,7 @@ class ResponsiveGrid extends StatelessWidget {
             spacing: spacing,
             runSpacing: runSpacing,
             // CrossAxisAlignment controls vertical alignment in the row
-            crossAxisAlignment: WrapCrossAlignment.start, 
+            crossAxisAlignment: WrapCrossAlignment.start,
             children: children,
           );
         } else {
@@ -45,7 +45,7 @@ class ResponsiveGrid extends StatelessWidget {
   // Helper method to inject spacing between children in the Column layout
   List<Widget> _addSpacingToChildren(List<Widget> children, double spacing) {
     if (children.isEmpty) return children;
-    
+
     final List<Widget> spacedChildren = [];
     for (int i = 0; i < children.length; i++) {
       spacedChildren.add(children[i]);

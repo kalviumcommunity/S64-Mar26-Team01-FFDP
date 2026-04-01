@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../models/post_model.dart';
 
 /// Service class for Firestore database operations
 class FirestoreService {
@@ -15,7 +16,7 @@ class FirestoreService {
           .doc(user.uid)
           .set(user.toMap(), SetOptions(merge: true));
     } catch (e) {
-      throw 'Failed to create user document: $e';
+      throw Exception('Failed to create user document: $e');
     }
   }
 
@@ -28,7 +29,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      throw 'Failed to fetch user document: $e';
+      throw Exception('Failed to fetch user document: $e');
     }
   }
 
@@ -59,7 +60,7 @@ class FirestoreService {
         await _firestore.collection('users').doc(uid).update(updates);
       }
     } catch (e) {
-      throw 'Failed to update user profile: $e';
+      throw Exception('Failed to update user profile: $e');
     }
   }
 
@@ -85,34 +86,66 @@ class FirestoreService {
       });
       return docRef.id;
     } catch (e) {
-      throw 'Failed to create post: $e';
+      throw Exception('Failed to create post: $e');
     }
   }
 
-  /// Get all posts as a stream
-  Stream<List<Map<String, dynamic>>> getPostsStream() {
+  /// Get all posts as a stream with enhanced error handling
+  Stream<List<PostModel>> getPostsStream() {
     return _firestore
         .collection('posts')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => {...doc.data(), 'id': doc.id})
-          .toList();
+      return snapshot.docs.map((doc) {
+        try {
+          // Safely handle potentially malformed documents
+          return PostModel.fromFirestore(doc);
+        } catch (e) {
+          // We can't return null here, so we create a placeholder post
+          return PostModel(
+            postId: doc.id,
+            uid: 'error',
+            displayName: 'Error Loading Post',
+            content: 'This post could not be loaded due to a data error.',
+            likes: 0,
+            comments: 0,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            tags: [],
+          );
+        }
+      }).toList();
     });
   }
 
-  /// Get posts by user
-  Stream<List<Map<String, dynamic>>> getUserPostsStream(String uid) {
+  /// Get posts by user with enhanced error handling
+  Stream<List<PostModel>> getUserPostsStream(String uid) {
     return _firestore
         .collection('posts')
         .where('uid', isEqualTo: uid)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => {...doc.data(), 'id': doc.id})
-          .toList();
+      return snapshot.docs.map((doc) {
+        try {
+          // Safely handle potentially malformed documents
+          return PostModel.fromFirestore(doc);
+        } catch (e) {
+          // We can't return null here, so we create a placeholder post
+          return PostModel(
+            postId: doc.id,
+            uid: 'error',
+            displayName: 'Error Loading Post',
+            content: 'This post could not be loaded due to a data error.',
+            likes: 0,
+            comments: 0,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            tags: [],
+          );
+        }
+      }).toList();
     });
   }
 
@@ -127,7 +160,7 @@ class FirestoreService {
         'updatedAt': Timestamp.now(),
       });
     } catch (e) {
-      throw 'Failed to update post: $e';
+      throw Exception('Failed to update post: $e');
     }
   }
 
@@ -136,7 +169,7 @@ class FirestoreService {
     try {
       await _firestore.collection('posts').doc(postId).delete();
     } catch (e) {
-      throw 'Failed to delete post: $e';
+      throw Exception('Failed to delete post: $e');
     }
   }
 
@@ -147,7 +180,7 @@ class FirestoreService {
         'likes': FieldValue.increment(1),
       });
     } catch (e) {
-      throw 'Failed to like post: $e';
+      throw Exception('Failed to like post: $e');
     }
   }
 
@@ -158,8 +191,75 @@ class FirestoreService {
         'likes': FieldValue.increment(-1),
       });
     } catch (e) {
-      throw 'Failed to unlike post: $e';
+      throw Exception('Failed to unlike post: $e');
     }
+  }
+
+  // ==================== Enhanced Real-Time Features ====================
+
+  /// Get real-time updates for a specific post
+  Stream<Map<String, dynamic>?> getPostStream(String postId) {
+    return _firestore.collection('posts').doc(postId).snapshots().map((doc) {
+      if (doc.exists) {
+        try {
+          return {...doc.data() as Map<String, dynamic>, 'id': doc.id};
+        } catch (e) {
+          return {
+            'id': doc.id,
+            'content': 'Unable to load post',
+            'error': true,
+          };
+        }
+      }
+      return null;
+    });
+  }
+
+  /// Get real-time updates for posts with specific tags
+  Stream<List<Map<String, dynamic>>> getTaggedPostsStream(String tag) {
+    return _firestore
+        .collection('posts')
+        .where('tags', arrayContains: tag)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        try {
+          final data = doc.data();
+          return {...data, 'id': doc.id};
+        } catch (e) {
+          return {
+            'id': doc.id,
+            'content': 'Unable to load post',
+            'error': true,
+          };
+        }
+      }).toList();
+    });
+  }
+
+  /// Get real-time notifications for a user
+  Stream<List<Map<String, dynamic>>> getUserNotificationsStream(String uid) {
+    return _firestore
+        .collection('notifications')
+        .where('userId', isEqualTo: uid)
+        .orderBy('timestamp', descending: true)
+        .limit(20)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        try {
+          final data = doc.data();
+          return {...data, 'id': doc.id};
+        } catch (e) {
+          return {
+            'id': doc.id,
+            'content': 'Unable to load notification',
+            'error': true,
+          };
+        }
+      }).toList();
+    });
   }
 
   // ==================== General Read Operations ====================
@@ -187,7 +287,7 @@ class FirestoreService {
           .map((doc) => {...doc.data() as Map<String, dynamic>, 'id': doc.id})
           .toList();
     } catch (e) {
-      throw 'Failed to query documents: $e';
+      throw Exception('Failed to query documents: $e');
     }
   }
 
@@ -216,7 +316,7 @@ class FirestoreService {
         await post.reference.delete();
       }
     } catch (e) {
-      throw 'Failed to delete user account: $e';
+      throw Exception('Failed to delete user account: $e');
     }
   }
 }

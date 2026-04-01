@@ -10,7 +10,7 @@ final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
 class ThemeNotifier extends StateNotifier<ThemeMode> {
   ThemeNotifier() : super(ThemeMode.system);
 
-  /// Toggle between Light and Dark mode. 
+  /// Toggle between Light and Dark mode.
   /// If currently System, it will switch to the opposite of what the system currently is.
   void toggleTheme(BuildContext context) {
     final brightness = View.of(context).platformDispatcher.platformBrightness;
