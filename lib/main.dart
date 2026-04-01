@@ -81,34 +81,3 @@ class FirebaseErrorApp extends StatelessWidget {
   }
 }
 
-/// AuthGate — listens to Firebase auth state for persistent session handling.
-///
-/// Flow:
-///   App opens → SplashScreen (while Firebase checks stored token)
-///   Token valid  → HomeScreen  (auto-login, no credentials needed)
-///   Token absent → AuthScreen  (user must sign in)
-///   User logs out → AuthScreen (session cleared)
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: AuthService().authStateChanges(),
-      builder: (context, snapshot) {
-        // Firebase is checking the persisted session token — show splash
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SplashScreen();
-        }
-
-        // Valid session found → skip login, go straight to HomeScreen
-        if (snapshot.hasData) {
-          return const HomeScreen();
-        }
-
-        // No session / logged out → show AuthScreen
-        return const AuthScreen();
-      },
-    );
-  }
-}
