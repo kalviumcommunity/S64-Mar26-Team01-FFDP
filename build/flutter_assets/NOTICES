@@ -2122,6 +2122,9 @@ google_maps_flutter
 google_maps_flutter_android
 google_maps_flutter_ios
 google_maps_flutter_platform_interface
+google_sign_in_android
+google_sign_in_ios
+google_sign_in_web
 image_picker_for_web
 image_picker_macos
 image_picker_platform_interface
@@ -6439,6 +6442,9 @@ SOFTWARE.
 --------------------------------------------------------------------------------
 flutter_lints
 go_router
+google_identity_services_web
+google_sign_in
+google_sign_in_platform_interface
 image_picker_linux
 image_picker_windows
 path_provider

@@ -2,63 +2,67 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as logger from 'firebase-functions/logger';
 import { createIdempotentNotification } from '../utils/idempotency';
 import { db } from '../config/firebase';
-import { LikeDocument } from '../types';
 
-export const onNewLike = onDocumentCreated('likes/{likeId}', async (event) => {
+/**
+ * Trigger: When a new review is created for a babysitter.
+ * Action: Notify the babysitter and update their average rating.
+ */
+export const onNewReview = onDocumentCreated('reviews/{reviewId}', async (event) => {
   const snapshot = event.data;
   if (!snapshot) {
-    logger.error('No data associated with the event.');
+    logger.error('No data associated with the review event.');
     return;
   }
 
-  const data = snapshot.data() as LikeDocument;
-  const actorId = data?.userId || data?.actorId;
-  const postId = data?.postId;
-  
-  // Safe default to server time if unset by client for some reason
+  const data = snapshot.data();
+  const parentId = data?.parentId;
+  const babysitterId = data?.babysitterId;
+  const jobId = data?.jobId;
+  const rating = data?.rating ?? 0;
   const createdAt = data?.createdAt || new Date();
 
-  if (!actorId || !postId) {
-    logger.warn(`Like ${event.params.likeId} missing actorId or postId. Cannot process.`);
+  if (!parentId || !babysitterId || !jobId) {
+    logger.warn(`Review ${event.params.reviewId} missing required fields.`);
     return;
   }
 
   try {
-    // Fetch post to determine owner
-    const postSnap = await db.collection('posts').doc(postId).get();
-    if (!postSnap.exists) {
-        logger.warn(`Post ${postId} does not exist. Cannot notify owner.`);
-        return;
-    }
+    // 1. Send notification to babysitter
+    const notificationId = `review_${event.params.reviewId}`;
 
-    const postData = postSnap.data();
-    const ownerId = postData?.ownerId || postData?.userId;
-
-    if (!ownerId) {
-        logger.warn(`Post ${postId} missing ownerId.`);
-        return;
-    }
-
-    // Protect against self-notification
-    if (ownerId === actorId) {
-      logger.info(`User ${actorId} liked their own post. Skipping notification.`);
-      return;
-    }
-
-    // Creating notification deterministically based on likeId guarantees idempotency.
-    // Retried functions will skip over if the document already exists.
-    const notificationId = `like_${event.params.likeId}`;
-    
     await createIdempotentNotification(notificationId, {
       id: notificationId,
-      type: 'like',
-      actorId,
-      recipientId: ownerId,
-      entityId: postId,
+      type: 'review',
+      actorId: parentId,
+      recipientId: babysitterId,
+      entityId: jobId,
       createdAt,
       read: false,
+      messageSnippet: `New ${rating}⭐ review received`,
     });
+
+    // 2. Recalculate babysitter's average rating
+    const reviewsSnap = await db
+      .collection('reviews')
+      .where('babysitterId', '==', babysitterId)
+      .get();
+
+    if (!reviewsSnap.empty) {
+      let total = 0;
+      reviewsSnap.docs.forEach((doc) => {
+        total += (doc.data().rating as number) || 0;
+      });
+      const avgRating = total / reviewsSnap.size;
+
+      await db.collection('users').doc(babysitterId).update({
+        averageRating: Math.round(avgRating * 10) / 10, // round to 1 decimal
+      });
+
+      logger.info(
+        `Updated babysitter ${babysitterId} averageRating to ${avgRating.toFixed(1)}`
+      );
+    }
   } catch (error) {
-    logger.error('Error processing onNewLike', error);
+    logger.error('Error processing onNewReview', error);
   }
 });

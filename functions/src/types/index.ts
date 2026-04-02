@@ -2,41 +2,46 @@ import * as admin from 'firebase-admin';
 
 export interface NotificationPayload {
   id: string;
-  type: 'like' | 'comment' | 'message';
+  type: 'review' | 'job_request' | 'message';
   actorId: string;
   recipientId: string;
-  entityId: string; // ID of the triggering document (like, comment, or message ID)
+  entityId: string;
   createdAt: admin.firestore.Timestamp | Date;
   read: boolean;
-  messageSnippet?: string; // Optional context, e.g. snippet of comment or message
+  messageSnippet?: string;
 }
 
-export interface LikeDocument {
-  userId?: string;
-  actorId?: string;
-  ownerId?: string; // To whom the like belongs
-  postId?: string;
+export interface ReviewDocument {
+  parentId?: string;
+  babysitterId?: string;
+  jobId?: string;
+  rating?: number;
+  feedback?: string;
   createdAt?: admin.firestore.Timestamp;
 }
 
-export interface CommentDocument {
-  userId?: string;
-  actorId?: string;
-  ownerId?: string;
-  postId?: string;
-  text?: string;
-  content?: string;
+export interface JobDocument {
+  parentId?: string;
+  babysitterId?: string;
+  status?: string;
+  startTime?: admin.firestore.Timestamp;
+  endTime?: admin.firestore.Timestamp;
+  hourlyRateApplied?: number;
+  totalEstimatedCost?: number;
+  jobAddress?: string;
+  specialInstructions?: string;
   createdAt?: admin.firestore.Timestamp;
+  updatedAt?: admin.firestore.Timestamp;
 }
 
 export interface MessageDocument {
   senderId?: string;
-  userId?: string; // App-side alternate for senderId depending on schema
+  userId?: string;
   recipientId?: string;
-  targetId?: string; // Alternate for recipientId
+  targetId?: string;
   text?: string;
   content?: string;
   chatId?: string;
-  conversationId?: string; // Alternate for chatId
+  conversationId?: string;
   createdAt?: admin.firestore.Timestamp;
 }

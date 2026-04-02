@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
-  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void dispose() {
@@ -41,13 +40,50 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     setState(() => _isLoading = true);
 
-    // Mock Login for Frontend UI Testing
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to Home screen
-      context.go('/');
+    try {
+      await _authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (mounted) {
+        context.go('/');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final credential = await _authService.signInWithGoogle();
+      if (credential != null && mounted) {
+        context.go('/');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _handlePhoneSignIn() {
+    // Navigate to phone auth screen
+    context.pushNamed('phone-auth');
   }
 
   @override
@@ -65,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Spacer(flex: 3), // Dynamic top spacing
+                const Spacer(flex: 3), // Dynamic top spacing
 
                 // Image / Portrait replacing logo_white with logo
                 Flexible(
@@ -76,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Spacer(flex: 2), // Dynamic mid spacing
+                const Spacer(flex: 2), // Dynamic mid spacing
 
                 // Bottom layout Container (No Expandeds needed, takes natural height at bottom)
                 Container(
@@ -87,9 +123,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       end: Alignment.bottomCenter,
                       colors: [
                         const Color(0xFFF98E9B)
-                            .withOpacity(0.0), // Transparent top edge
+                            .withValues(alpha: 0.0), // Transparent top edge
                         const Color(0xFFE56A7A)
-                            .withOpacity(0.9), // Strong theme pink blur
+                            .withValues(alpha: 0.9), // Strong theme pink blur
                       ],
                     ),
                   ),
@@ -135,8 +171,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(
-                                  0.2), // Very subtle white underlay
+                              color: Colors.white.withValues(
+                                  alpha: 0.2), // Very subtle white underlay
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextField(
@@ -161,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextField(
@@ -205,6 +241,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                       true, // White solid background with colored text
                                   onPressed: _handleLogin,
                                 ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: GlassButton(
+                            text: 'Continue with Google',
+                            isPrimary: false,
+                            onPressed: _handleGoogleSignIn,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: GlassButton(
+                            text: 'Continue with Phone',
+                            isPrimary: false,
+                            onPressed: _handlePhoneSignIn,
+                          ),
                         ),
                         const SizedBox(height: 12),
 

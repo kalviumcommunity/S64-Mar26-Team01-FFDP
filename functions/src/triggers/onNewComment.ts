@@ -2,60 +2,51 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import * as logger from 'firebase-functions/logger';
 import { createIdempotentNotification } from '../utils/idempotency';
 import { db } from '../config/firebase';
-import { CommentDocument } from '../types';
 
-export const onNewComment = onDocumentCreated('comments/{commentId}', async (event) => {
+/**
+ * Trigger: When a new job booking is created.
+ * Action: Notify the babysitter about the incoming job request.
+ */
+export const onNewJobBooking = onDocumentCreated('jobs/{jobId}', async (event) => {
   const snapshot = event.data;
   if (!snapshot) {
-    logger.error('No data associated with the comment event.');
+    logger.error('No data associated with the job event.');
     return;
   }
 
-  const data = snapshot.data() as CommentDocument;
-  const actorId = data?.userId || data?.actorId;
-  const postId = data?.postId;
-  const text = data?.text || data?.content || '';
+  const data = snapshot.data();
+  const parentId = data?.parentId;
+  const babysitterId = data?.babysitterId;
+  const jobAddress = data?.jobAddress || 'Unknown location';
   const createdAt = data?.createdAt || new Date();
 
-  if (!actorId || !postId) {
-    logger.warn(`Comment ${event.params.commentId} missing actorId or postId.`);
+  if (!parentId || !babysitterId) {
+    logger.warn(`Job ${event.params.jobId} missing parentId or babysitterId.`);
     return;
   }
 
   try {
-    const postSnap = await db.collection('posts').doc(postId).get();
-    if (!postSnap.exists) {
-        logger.warn(`Post ${postId} does not exist.`);
-        return;
-    }
+    // Fetch parent display name for notification message
+    const parentSnap = await db.collection('users').doc(parentId).get();
+    const parentName = parentSnap.exists
+      ? parentSnap.data()?.displayName || 'A parent'
+      : 'A parent';
 
-    const postData = postSnap.data();
-    const ownerId = postData?.ownerId || postData?.userId;
+    const notificationId = `job_${event.params.jobId}`;
 
-    if (!ownerId) {
-        logger.warn(`Post ${postId} missing ownerId. Cannot notify.`);
-        return;
-    }
-
-    if (ownerId === actorId) {
-      logger.info(`User ${actorId} commented on their own post. Skipping notification.`);
-      return;
-    }
-
-    const snippet = text.length > 50 ? text.substring(0, 47) + '...' : text;
-    const notificationId = `comment_${event.params.commentId}`;
-    
     await createIdempotentNotification(notificationId, {
       id: notificationId,
-      type: 'comment',
-      actorId,
-      recipientId: ownerId,
-      entityId: postId,
+      type: 'job_request',
+      actorId: parentId,
+      recipientId: babysitterId,
+      entityId: event.params.jobId,
       createdAt,
       read: false,
-      messageSnippet: snippet,
+      messageSnippet: `${parentName} requested a booking at ${jobAddress}`,
     });
+
+    logger.info(`Notification sent to babysitter ${babysitterId} for job ${event.params.jobId}`);
   } catch (error) {
-    logger.error('Error processing onNewComment', error);
+    logger.error('Error processing onNewJobBooking', error);
   }
 });

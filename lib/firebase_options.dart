@@ -41,14 +41,14 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'PASTE_YOUR_WEB_API_KEY_HERE',
-    appId: 'PASTE_YOUR_WEB_APP_ID_HERE',
-    messagingSenderId: 'PASTE_YOUR_WEB_MESSAGING_SENDER_ID_HERE',
-    projectId: 'your-nanhenest-project-id',
-    authDomain: 'your-nanhenest-project-id.firebaseapp.com',
-    databaseURL: 'https://your-nanhenest-project-id.firebaseio.com',
-    storageBucket: 'your-nanhenest-project-id.appspot.com',
-    measurementId: 'PASTE_YOUR_WEB_MEASUREMENT_ID_HERE',
+    apiKey: 'AIzaSyB-mpCtqWGPZjz0x7ZORgHgmv5q-Z5Aals',
+    appId: '1:957531940657:web:fc624d11b492efd78bb210',
+    messagingSenderId: '957531940657',
+    projectId: 'nanhenest-54fb5',
+    authDomain: 'nanhenest-54fb5.firebaseapp.com',
+    databaseURL: 'https://nanhenest-54fb5.firebaseio.com',
+    storageBucket: 'nanhenest-54fb5.appspot.com',
+    measurementId: 'G-NGRY33H37Q',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

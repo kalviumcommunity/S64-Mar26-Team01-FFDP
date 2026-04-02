@@ -1,3 +1,3 @@
-export { onNewLike } from './triggers/onNewLike';
-export { onNewComment } from './triggers/onNewComment';
+export { onNewReview } from './triggers/onNewLike';
+export { onNewJobBooking } from './triggers/onNewComment';
 export { onNewMessage } from './triggers/onNewMessage';

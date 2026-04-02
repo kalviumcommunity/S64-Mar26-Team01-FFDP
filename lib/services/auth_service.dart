@@ -1,11 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/user_model.dart';
 
 /// Service class for Firebase Authentication operations
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _isGoogleInitialized = false;
 
   /// Sign up a new user with email and password
   Future<UserCredential> signUp({
@@ -26,10 +30,7 @@ class AuthService {
         email: email,
         displayName: displayName,
         avatarUrl: '',
-        bio: '',
-        postCount: 0,
-        followerCount: 0,
-        followingCount: 0,
+        role: 'parent', // Default role
         fcmToken: '',
         createdAt: DateTime.now(),
         lastActive: DateTime.now(),
@@ -76,6 +77,129 @@ class AuthService {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
+    }
+  }
+
+  /// Sign in with Google
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      UserCredential userCredential;
+
+      if (kIsWeb) {
+        // ── Web: Use Firebase Auth's built-in Google popup ──
+        // google_sign_in 7.x does NOT support authenticate() on web,
+        // so we bypass the plugin entirely and use Firebase Auth directly.
+        final googleProvider = GoogleAuthProvider();
+        googleProvider.addScope('email');
+        googleProvider.addScope('profile');
+        userCredential = await _firebaseAuth.signInWithPopup(googleProvider);
+      } else {
+        // ── Mobile / Desktop: Use google_sign_in plugin ──
+        if (!_isGoogleInitialized) {
+          await _googleSignIn.initialize();
+          _isGoogleInitialized = true;
+        }
+
+        final googleUser = await _googleSignIn.authenticate();
+        final GoogleSignInAuthentication googleAuth =
+            googleUser.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+
+        userCredential = await _firebaseAuth.signInWithCredential(credential);
+      }
+
+      // Check if user is new, and create a Firestore document if so
+      final userDoc = await _firebaseFirestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        final userModel = UserModel(
+          uid: userCredential.user!.uid,
+          email: userCredential.user?.email ?? '',
+          displayName: userCredential.user?.displayName ?? 'Google User',
+          avatarUrl: userCredential.user?.photoURL ?? '',
+          role: 'parent',
+          fcmToken: '',
+          createdAt: DateTime.now(),
+          lastActive: DateTime.now(),
+        );
+
+        await _firebaseFirestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(userModel.toMap());
+      }
+      return userCredential;
+    } catch (e) {
+      throw Exception('Failed to sign in with Google: $e');
+    }
+  }
+
+  /// Send Phone Auth OTP
+  Future<void> sendPhoneOtp({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(FirebaseAuthException e) onVerificationFailed,
+    required Function(String verificationId) onCodeAutoRetrievalTimeout,
+  }) async {
+    await _firebaseAuth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+         // Auto retrieval or instant validation (only on android sometimes)
+         await _firebaseAuth.signInWithCredential(credential);
+      },
+      verificationFailed: onVerificationFailed,
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: onCodeAutoRetrievalTimeout,
+    );
+  }
+
+  /// Verify OTP and sign in
+  Future<UserCredential> verifyPhoneOtp({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      
+      // Check if user is new
+      final userDoc = await _firebaseFirestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        final userModel = UserModel(
+          uid: userCredential.user!.uid,
+          email: '', // Phone auth might not have email
+          displayName: 'Phone User',
+          avatarUrl: '',
+          role: 'parent',
+          fcmToken: '',
+          createdAt: DateTime.now(),
+          lastActive: DateTime.now(),
+        );
+
+        await _firebaseFirestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(userModel.toMap());
+      }
+
+      return userCredential;
+    } catch (e) {
+      throw Exception('Invalid OTP. Please try again.');
     }
   }
 

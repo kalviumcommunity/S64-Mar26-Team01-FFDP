@@ -23,19 +23,19 @@ class FirestoreReadDemoScreen extends StatelessWidget {
           centerTitle: true,
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Live Feed'),
-              Tab(text: 'My Posts'),
+              Tab(text: 'Live Jobs'),
+              Tab(text: 'My Jobs'),
               Tab(text: 'My Profile'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            // ── Tab 1: Real-time stream of all posts ──────────────────────
-            _AllPostsTab(theme: theme),
+            // ── Tab 1: Real-time stream of all jobs ──────────────────────
+            _AllJobsTab(theme: theme),
 
-            // ── Tab 2: Filtered query — only current user's posts ─────────
-            _MyPostsTab(uid: uid, theme: theme),
+            // ── Tab 2: Filtered query — only current user's jobs ─────────
+            _MyJobsTab(uid: uid, theme: theme),
 
             // ── Tab 3: Single document read — user profile ────────────────
             _ProfileTab(uid: uid, theme: theme),
@@ -46,10 +46,10 @@ class FirestoreReadDemoScreen extends StatelessWidget {
   }
 }
 
-// ── Tab 1: StreamBuilder on posts/ collection ─────────────────────────────────
-class _AllPostsTab extends StatelessWidget {
+// ── Tab 1: StreamBuilder on jobs/ collection ─────────────────────────────────
+class _AllJobsTab extends StatelessWidget {
   final ThemeData theme;
-  const _AllPostsTab({required this.theme});
+  const _AllJobsTab({required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +58,13 @@ class _AllPostsTab extends StatelessWidget {
       children: [
         const _SectionHeader(
           icon: Icons.stream,
-          label: 'Real-time stream — posts/ collection',
+          label: 'Real-time stream — jobs/ collection',
           subtitle: 'Updates instantly when Firestore data changes',
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection('posts')
+                .collection('jobs')
                 .orderBy('createdAt', descending: true)
                 .snapshots(),
             builder: (context, snapshot) {
@@ -73,8 +73,8 @@ class _AllPostsTab extends StatelessWidget {
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const _EmptyState(
-                  icon: Icons.article_outlined,
-                  message: 'No posts yet.\nCreate one from the Dashboard.',
+                  icon: Icons.work_outline,
+                  message: 'No jobs yet.\nCreate one from the Dashboard.',
                 );
               }
               final docs = snapshot.data!.docs;
@@ -83,7 +83,7 @@ class _AllPostsTab extends StatelessWidget {
                 itemCount: docs.length,
                 itemBuilder: (context, i) {
                   final data = docs[i].data() as Map<String, dynamic>;
-                  return _PostCard(data: data);
+                  return _JobCard(data: data);
                 },
               );
             },
@@ -94,11 +94,11 @@ class _AllPostsTab extends StatelessWidget {
   }
 }
 
-// ── Tab 2: Filtered query — where('uid', isEqualTo: uid) ─────────────────────
-class _MyPostsTab extends StatelessWidget {
+// ── Tab 2: Filtered query — where('parentId', isEqualTo: uid) ────────────────
+class _MyJobsTab extends StatelessWidget {
   final String uid;
   final ThemeData theme;
-  const _MyPostsTab({required this.uid, required this.theme});
+  const _MyJobsTab({required this.uid, required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -107,19 +107,19 @@ class _MyPostsTab extends StatelessWidget {
       children: [
         const _SectionHeader(
           icon: Icons.filter_list,
-          label: 'Filtered query — my posts only',
-          subtitle: '.where("uid", isEqualTo: currentUser.uid)',
+          label: 'Filtered query — my jobs only',
+          subtitle: '.where("parentId", isEqualTo: currentUser.uid)',
         ),
         Expanded(
           child: uid.isEmpty
               ? const _EmptyState(
                   icon: Icons.lock_outline,
-                  message: 'Sign in to see your posts',
+                  message: 'Sign in to see your jobs',
                 )
               : StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('posts')
-                      .where('uid', isEqualTo: uid)
+                      .collection('jobs')
+                      .where('parentId', isEqualTo: uid)
                       .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
@@ -129,7 +129,7 @@ class _MyPostsTab extends StatelessWidget {
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                       return const _EmptyState(
                         icon: Icons.edit_note,
-                        message: "You haven't posted anything yet.",
+                        message: "You haven't created any jobs yet.",
                       );
                     }
                     final docs = snapshot.data!.docs;
@@ -138,7 +138,7 @@ class _MyPostsTab extends StatelessWidget {
                       itemCount: docs.length,
                       itemBuilder: (context, i) {
                         final data = docs[i].data() as Map<String, dynamic>;
-                        return _PostCard(data: data, highlight: true);
+                        return _JobCard(data: data, highlight: true);
                       },
                     );
                   },
@@ -285,10 +285,10 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _PostCard extends StatelessWidget {
+class _JobCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final bool highlight;
-  const _PostCard({required this.data, this.highlight = false});
+  const _JobCard({required this.data, this.highlight = false});
 
   @override
   Widget build(BuildContext context) {
@@ -307,6 +307,15 @@ class _PostCard extends StatelessWidget {
       }
     }
 
+    final status = data['status'] ?? 'pending';
+    final statusColor = switch (status) {
+      'completed' => Colors.green,
+      'in_progress' => Colors.blue,
+      'accepted' => Colors.orange,
+      'rejected' || 'cancelled' => Colors.red,
+      _ => Colors.grey,
+    };
+
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       color: highlight
@@ -320,9 +329,21 @@ class _PostCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(data['displayName'] ?? 'Anonymous',
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    status.toString().toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: statusColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 Text(timeStr,
                     style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurface
@@ -330,22 +351,25 @@ class _PostCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text(data['content'] ?? '', style: theme.textTheme.bodyMedium),
+            Text(data['jobAddress'] ?? 'No address',
+                style: theme.textTheme.bodyMedium),
             const SizedBox(height: 10),
             Row(
               children: [
-                Icon(Icons.favorite_outline,
+                Icon(Icons.attach_money,
                     size: 16,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 const SizedBox(width: 4),
-                Text('${data['likes'] ?? 0}',
+                Text(
+                    '₹${(data['totalEstimatedCost'] ?? 0.0).toStringAsFixed(0)}',
                     style: theme.textTheme.labelSmall),
                 const SizedBox(width: 12),
-                Icon(Icons.comment_outlined,
+                Icon(Icons.access_time,
                     size: 16,
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                 const SizedBox(width: 4),
-                Text('${data['comments'] ?? 0}',
+                Text(
+                    '₹${(data['hourlyRateApplied'] ?? 0.0).toStringAsFixed(0)}/hr',
                     style: theme.textTheme.labelSmall),
               ],
             ),
@@ -364,6 +388,8 @@ class _ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final role = data['role'] ?? 'parent';
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Padding(
@@ -417,14 +443,26 @@ class _ProfileCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
+            _Row('Role', role.toString().toUpperCase()),
             _Row(
                 'Bio',
                 data['bio']?.toString().isNotEmpty == true
                     ? data['bio']
                     : 'No bio set'),
-            _Row('Posts', '${data['postCount'] ?? 0}'),
-            _Row('Followers', '${data['followerCount'] ?? 0}'),
-            _Row('Following', '${data['followingCount'] ?? 0}'),
+            if (role == 'babysitter') ...[
+              _Row('Hourly Rate',
+                  '₹${(data['hourlyRate'] ?? 0.0).toStringAsFixed(0)}'),
+              _Row('Experience',
+                  '${data['yearsOfExperience'] ?? 0} years'),
+              _Row('Rating',
+                  '${(data['averageRating'] ?? 0.0).toStringAsFixed(1)} ⭐'),
+              _Row('Jobs Done',
+                  '${data['totalJobsCompleted'] ?? 0}'),
+            ],
+            if (role == 'parent') ...[
+              _Row('Children',
+                  '${data['childrenCount'] ?? 0}'),
+            ],
           ],
         ),
       ),
@@ -445,12 +483,12 @@ class _Row extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 80,
+            width: 100,
             child: Text(label,
                 style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
-          Text(value, style: theme.textTheme.bodyMedium),
+          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );

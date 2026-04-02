@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // NanheNest — Firestore Security Rules
-// Principle: deny everything by default, allow only what is explicitly permitted.
+// Updated for Babysitter Marketplace Schema
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -13,75 +13,55 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Returns true if the signed-in user's UID matches the document owner
+    // Returns true if the signed-in user's UID matches the given uid
     function isOwner(uid) {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
     // ── users/{uid} ─────────────────────────────────────────────────────────
-    // Any authenticated user can read profiles (for social features).
-    // Only the document owner can write their own profile.
     match /users/{uid} {
-      allow read:  if isAuthenticated();
+      // Any authenticated user can read profiles (Needed for Map/Search)
+      // EXCEPT the verification map
+      allow read: if isAuthenticated();
+      
+      // Only the owner can write their own profile
       allow write: if isOwner(uid);
-
-      // items subcollection — full CRUD, owner only (Assignment 3.42)
-      match /items/{itemId} {
-        allow read, write: if isOwner(uid);
-      }
     }
 
-    // ── posts/{postId} ──────────────────────────────────────────────────────
-    // Any authenticated user can read posts.
-    // Any authenticated user can create a post (uid must match their own).
-    // Only the post author can update or delete their post.
-    match /posts/{postId} {
-      allow read:   if isAuthenticated();
-      allow create: if isAuthenticated()
-                    && request.resource.data.uid == request.auth.uid;
-      allow update,
-            delete: if isAuthenticated()
-                    && resource.data.uid == request.auth.uid;
-
-      // comments subcollection — any authenticated user can read/create,
-      // only the comment author can delete
-      match /comments/{commentId} {
-        allow read:   if isAuthenticated();
-        allow create: if isAuthenticated();
-        allow delete: if isAuthenticated()
-                      && resource.data.uid == request.auth.uid;
-      }
-
-      // likes subcollection — document ID is the liker's UID (prevents duplicates)
-      match /likes/{likerUid} {
-        allow read:   if isAuthenticated();
-        allow write:  if isOwner(likerUid);
-      }
+    // ── jobs/{jobId} ──────────────────────────────────────────────────────
+    match /jobs/{jobId} {
+      // A job can only be read or written by the specific parent or babysitter involved
+      allow read, write: if isAuthenticated() 
+                         && (resource.data.parentId == request.auth.uid 
+                             || resource.data.babysitterId == request.auth.uid
+                             || request.resource.data.parentId == request.auth.uid);
     }
 
-    // ── tasks/{taskId} ──────────────────────────────────────────────────────
-    // Used by Firestore Write/Query demo screens.
-    // Any authenticated user can read all tasks.
-    // Only the task creator can update or delete their task.
-    match /tasks/{taskId} {
-      allow read:   if isAuthenticated();
+    // ── reviews/{reviewId} ──────────────────────────────────────────────────
+    match /reviews/{reviewId} {
+      // Anyone can read reviews to see a babysitter's ratings
+      allow read: if isAuthenticated();
+      
+      // Only an authenticated parent can write a review about a babysitter
       allow create: if isAuthenticated()
-                    && request.resource.data.uid == request.auth.uid;
-      allow update,
-            delete: if isAuthenticated()
-                    && resource.data.uid == request.auth.uid;
+                    && request.resource.data.parentId == request.auth.uid;
+                    
+      // Reviews cannot be modified once created
+      allow update, delete: if false;
     }
 
-    // ── events/{eventId} ────────────────────────────────────────────────────
-    // Any authenticated user can read events and RSVP (update attendees).
-    // Only the event creator can delete or fully update the event.
-    match /events/{eventId} {
-      allow read:   if isAuthenticated();
-      allow create: if isAuthenticated()
-                    && request.resource.data.creatorUid == request.auth.uid;
-      allow update: if isAuthenticated();   // allows RSVP by any user
-      allow delete: if isAuthenticated()
-                    && resource.data.creatorUid == request.auth.uid;
+    // ── chats/{chatId} & messages ──────────────────────────────────────────
+    match /chats/{chatId} {
+      // A user can read/write chats if they are in the participants array
+      allow read, write: if isAuthenticated() 
+                         && request.auth.uid in resource.data.participants;
+                         
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() 
+                    && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+        allow create: if isAuthenticated() 
+                      && request.auth.uid == request.resource.data.senderId;
+      }
     }
 
     // ── Deny everything else ────────────────────────────────────────────────

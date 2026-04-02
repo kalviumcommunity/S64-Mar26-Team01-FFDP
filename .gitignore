@@ -48,6 +48,6 @@ app.*.map.json
 .DS_Store
 .env
 google-services.json
+serviceAccountKey.json
 GoogleService-Info.plist
-
-
+firebase_options.dart

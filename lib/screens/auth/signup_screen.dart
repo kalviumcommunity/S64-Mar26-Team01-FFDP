@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 import '../../utils/validators.dart';
 import '../../widgets/custom_text_field.dart';
@@ -89,6 +90,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       }
     }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final credential = await _authService.signInWithGoogle();
+      if (credential != null && mounted) {
+        context.go('/');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _handlePhoneSignIn() {
+    context.pushNamed('phone-auth');
   }
 
   @override
@@ -216,6 +241,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: _isLoading ? null : _handleSignUp,
                 ),
                 const SizedBox(height: 16),
+
+                PrimaryButton(
+                  label: 'Continue with Google',
+                  isOutlined: true,
+                  onPressed: _isLoading ? null : _handleGoogleSignIn,
+                ),
+                const SizedBox(height: 16),
+
+                PrimaryButton(
+                  label: 'Continue with Phone',
+                  isOutlined: true,
+                  onPressed: _isLoading ? null : _handlePhoneSignIn,
+                ),
+                const SizedBox(height: 24),
 
                 // Login Link
                 Center(

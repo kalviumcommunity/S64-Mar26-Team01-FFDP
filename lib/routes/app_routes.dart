@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/home/dashboard_screen.dart';
-import '../screens/home/realtime_feed_screen.dart';
 import '../screens/home/realtime_chat_list_screen.dart';
-import '../screens/home/create_post_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/auth_screen.dart';
@@ -37,11 +35,9 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String auth = '/auth';
   static const String dashboard = '/dashboard';
-  static const String realtimeFeed = '/realtime-feed';
   static const String realtimeChatList = '/realtime-chat-list';
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
-  static const String createPost = '/create-post';
   static const String settings = '/settings';
   static const String about = '/about';
   static const String devToolsDemo = '/devtools-demo';
@@ -66,11 +62,9 @@ class AppRoutes {
               Navigator.pushReplacementNamed(ctx, login);
             }),
         dashboard: (_) => const DashboardScreen(),
-        realtimeFeed: (_) => const RealtimeFeedScreen(),
         realtimeChatList: (_) => const RealtimeChatListScreen(),
         profile: (_) => const ProfileScreen(),
         editProfile: (_) => const EditProfileScreen(),
-        createPost: (_) => const CreatePostScreen(),
         settings: (_) => const SettingsScreen(),
         about: (_) => const AboutScreen(),
         devToolsDemo: (_) => const DevToolsDemoScreen(),

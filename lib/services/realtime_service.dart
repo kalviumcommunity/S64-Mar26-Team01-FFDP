@@ -1,102 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/post_model.dart';
 import '../models/message_model.dart';
+import '../models/job_model.dart';
 
 /// Centralized service for all real-time Firestore synchronization
 class RealtimeService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // ==================== POST/FEED REAL-TIME SYNC ====================
-
-  /// Get real-time stream of all posts for the main feed
-  Stream<List<PostModel>> getFeedStream() {
-    return _firestore
-        .collection('posts')
-        .orderBy('createdAt', descending: true)
-        .limit(50) // Limit for performance
-        .snapshots()
-        .handleError((error) {
-      // Handle errors gracefully
-      return Stream.value(<PostModel>[]);
-    }).map((snapshot) {
-      return snapshot.docs.map((doc) {
-        try {
-          return PostModel.fromFirestore(doc);
-        } catch (e) {
-          // Return a safe fallback for malformed documents
-          return PostModel(
-            postId: doc.id,
-            uid: 'error',
-            displayName: 'Error Loading',
-            content: 'Could not load this post',
-            likes: 0,
-            comments: 0,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            tags: [],
-          );
-        }
-      }).toList();
-    });
-  }
-
-  /// Get real-time stream of posts for a specific user
-  Stream<List<PostModel>> getUserFeedStream(String userId) {
-    return _firestore
-        .collection('posts')
-        .where('uid', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .handleError((error) {
-      return Stream.value(<PostModel>[]);
-    }).map((snapshot) {
-      return snapshot.docs.map((doc) {
-        try {
-          return PostModel.fromFirestore(doc);
-        } catch (e) {
-          return PostModel(
-            postId: doc.id,
-            uid: 'error',
-            displayName: 'Error Loading',
-            content: 'Could not load this post',
-            likes: 0,
-            comments: 0,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            tags: [],
-          );
-        }
-      }).toList();
-    });
-  }
-
-  /// Get real-time updates for a specific post
-  Stream<PostModel?> getPostStream(String postId) {
-    return _firestore
-        .collection('posts')
-        .doc(postId)
-        .snapshots()
-        .handleError((error) {
-      return Stream.value(null);
-    }).map((doc) {
-      if (!doc.exists) return null;
-      try {
-        return PostModel.fromFirestore(doc);
-      } catch (e) {
-        return PostModel(
-          postId: doc.id,
-          uid: 'error',
-          displayName: 'Error Loading',
-          content: 'Could not load this post',
-          likes: 0,
-          comments: 0,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          tags: [],
-        );
-      }
-    });
-  }
 
   // ==================== CHAT/MESSAGE REAL-TIME SYNC ====================
 
@@ -200,35 +108,16 @@ class RealtimeService {
     });
   }
 
-  // ==================== SEARCH & DISCOVERY REAL-TIME SYNC ====================
+  // ==================== JOB REAL-TIME SYNC ====================
+  // Example for new Marketplace schema
 
-  /// Get real-time updates for trending posts
-  Stream<List<PostModel>> getTrendingPostsStream() {
+  Stream<List<JobModel>> getActiveJobsStream(String babysitterId) {
     return _firestore
-        .collection('posts')
-        .orderBy('likes', descending: true)
-        .limit(20)
-        .snapshots()
-        .handleError((error) {
-      return Stream.value(<PostModel>[]);
-    }).map((snapshot) {
-      return snapshot.docs.map((doc) {
-        try {
-          return PostModel.fromFirestore(doc);
-        } catch (e) {
-          return PostModel(
-            postId: doc.id,
-            uid: 'error',
-            displayName: 'Error Loading',
-            content: 'Could not load this post',
-            likes: 0,
-            comments: 0,
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-            tags: [],
-          );
-        }
-      }).toList();
-    });
+        .collection('jobs')
+        .where('babysitterId', isEqualTo: babysitterId)
+        .where('status', whereIn: ['pending', 'accepted', 'in_progress'])
+        .snapshots().map((snapshot) {
+           return snapshot.docs.map((doc) => JobModel.fromFirestore(doc)).toList();
+        });
   }
 }
