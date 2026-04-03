@@ -52,5 +52,5 @@ serviceAccountKey.json
 GoogleService-Info.plist
 firebase_options.dart
 
-# Local setup documentation
-SETUP_STATUS.md
+# All markdown files (documentation)
+*.md
