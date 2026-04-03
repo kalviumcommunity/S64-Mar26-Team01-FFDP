@@ -94,28 +94,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _uploadError = null;
     });
 
-    final uploadId =
-        'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
+    final storagePath =
+        'avatars/${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-    final result = await StorageService.instance.uploadUserAvatar(
-      userId: user.uid,
-      imageFile: _selectedImage!,
-      uploadId: uploadId,
-      onProgress: (progress) {
-        if (mounted) {
-          setState(() => _uploadProgress = progress);
-        }
-      },
-    );
+    try {
+      final downloadUrl = await StorageService.uploadFile(
+        _selectedImage!,
+        storagePath,
+        onProgress: (progress) {
+          if (mounted) {
+            setState(() => _uploadProgress = progress);
+          }
+        },
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() => _isUploading = false);
-
-    if (result.isSuccess) {
       setState(() {
-        _newAvatarUrl = result.downloadUrl;
-        _selectedImage = null; // Clear selected image on success
+        _isUploading = false;
+        _newAvatarUrl = downloadUrl;
+        _selectedImage = null;
       });
 
       // Show success feedback
@@ -128,21 +126,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       // TODO: Optionally update AuthService/Firestore with new avatar URL
-    } else {
-      setState(() => _uploadError = result.error?.message ?? 'Upload failed');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isUploading = false;
+        _uploadError = e.toString();
+      });
     }
   }
 
-  /// Cancel the current upload.
+  /// Cancel the current upload (not supported with static methods).
   Future<void> _cancelUpload() async {
-    final user = AuthService().currentUser;
-    if (user == null) return;
-
-    final uploadId =
-        'edit_profile_avatar_${DateTime.now().millisecondsSinceEpoch}';
-    final cancelled = await StorageService.instance.cancelUpload(uploadId);
-
-    if (cancelled && mounted) {
+    // Note: Firebase Storage doesn't support cancellation with static methods
+    // This would require refactoring to use UploadTask directly
+    if (mounted) {
       setState(() {
         _isUploading = false;
         _uploadProgress = 0.0;

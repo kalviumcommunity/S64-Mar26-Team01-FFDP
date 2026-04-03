@@ -98,6 +98,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isLogin ? 'Sign In' : 'Create Account'),
@@ -115,18 +118,18 @@ class _AuthScreenState extends State<AuthScreen> {
                 // Header
                 Text(
                   isLogin ? 'Welcome Back' : 'Join NanheNest',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   isLogin
                       ? 'Sign in to your account'
                       : 'Create your account to get started',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey[600],
+                  ),
                 ),
                 const SizedBox(height: 32),
 
@@ -199,19 +202,16 @@ class _AuthScreenState extends State<AuthScreen> {
                         isLogin
                             ? "Don't have an account? "
                             : 'Already have an account? ',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: theme.textTheme.bodyMedium,
                       ),
                       TextButton(
                         onPressed: _toggleMode,
                         child: Text(
                           isLogin ? 'Sign Up' : 'Sign In',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],

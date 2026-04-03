@@ -24,15 +24,21 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // Cache border radius to avoid recreating
+    const borderRadius = BorderRadius.all(Radius.circular(12));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -45,32 +51,29 @@ class CustomTextField extends StatelessWidget {
             prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
             suffixIcon: suffixIcon,
             filled: true,
-            // Uses Material 3 color roles for subtle surface layering
-            fillColor: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
-                .withOpacity(0.5),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+            fillColor:
+                colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            border: const OutlineInputBorder(
+              borderRadius: borderRadius,
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: borderRadius,
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                color: colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: borderRadius,
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: borderRadius,
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.error,
+                color: colorScheme.error,
               ),
             ),
             contentPadding:

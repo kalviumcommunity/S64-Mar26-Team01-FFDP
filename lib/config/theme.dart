@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Centralized Theme Configuration for the application using Material 3.
-/// This ensures consistent colors, typography, and component styling
-/// across all screens.
+/// Centralized Theme Configuration for NanheNest using Material 3.
+///
+/// Primary  — pinkish pale red  → #B5363E
+/// Secondary — bluish teal       → #3A6B67
 class AppTheme {
   // --- Typography ---
   static const TextTheme _textTheme = TextTheme(
@@ -35,72 +36,84 @@ class AppTheme {
   // --- Light Theme ---
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
-      primary: Color(0xFF6750A4),
-      onPrimary: Colors.white,
-      primaryContainer: Color(0xFFEADDFF),
-      onPrimaryContainer: Color(0xFF21005D),
-      secondary: Color(0xFF625B71),
-      onSecondary: Colors.white,
-      secondaryContainer: Color(0xFFE8DEF8),
-      onSecondaryContainer: Color(0xFF1D192B),
+      // Primary — pinkish / pale red
+      primary: Color(0xFFB5363E), // deep rose-red
+      onPrimary: Color(0xFFFFFFFF),
+      primaryContainer: Color(0xFFFFDAD9), // very pale pink
+      onPrimaryContainer: Color(0xFF410007),
+
+      // Secondary — bluish teal
+      secondary: Color(0xFF3A6B67), // teal-blue
+      onSecondary: Color(0xFFFFFFFF),
+      secondaryContainer: Color(0xFFBCEBE6), // pale mint-green
+      onSecondaryContainer: Color(0xFF00201E),
+
       error: Color(0xFFB3261E),
-      onError: Colors.white,
-      surface: Color(0xFFFFFBFE),
-      onSurface: Color(0xFF1C1B1F),
-      surfaceContainerHighest: Color(0xFFE7E0EC),
-      onSurfaceVariant: Color(0xFF49454F),
-      outline: Color(0xFF79747E),
+      onError: Color(0xFFFFFFFF),
+      surface: Color(0xFFFFF8F7), // warm white with pink tint
+      onSurface: Color(0xFF201A1A),
+      surfaceContainerHighest: Color(0xFFFFDAD9),
+      onSurfaceVariant: Color(0xFF534342),
+      outline: Color(0xFF857371),
     ),
     textTheme: _textTheme,
     appBarTheme: const AppBarTheme(
       centerTitle: true,
       elevation: 0,
       scrolledUnderElevation: 1,
+      backgroundColor: Color(0xFFFFF8F7),
+      foregroundColor: Color(0xFF201A1A),
     ),
-    cardTheme: CardThemeData(
-      elevation: 0,
+    cardTheme: const CardThemeData(
+      elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE7E0EC)),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
+      color: Color(0xFFFFF8F7),
+      surfaceTintColor: Colors.transparent,
     ),
   );
 
   // --- Dark Theme ---
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFFD0BCFF),
-      onPrimary: Color(0xFF381E72),
-      primaryContainer: Color(0xFF4F378B),
-      onPrimaryContainer: Color(0xFFEADDFF),
-      secondary: Color(0xFFCCC2DC),
-      onSecondary: Color(0xFF332D41),
-      secondaryContainer: Color(0xFF4A4458),
-      onSecondaryContainer: Color(0xFFE8DEF8),
+      // Primary — pinkish / pale red (lighter for dark bg)
+      primary: Color(0xFFFFB3B3), // soft pink
+      onPrimary: Color(0xFF680011),
+      primaryContainer: Color(0xFF920020),
+      onPrimaryContainer: Color(0xFFFFDAD9),
+
+      // Secondary — bluish teal (lighter for dark bg)
+      secondary: Color(0xFFA0CFCA), // pale teal
+      onSecondary: Color(0xFF003734),
+      secondaryContainer: Color(0xFF21504D),
+      onSecondaryContainer: Color(0xFFBCEBE6),
+
       error: Color(0xFFF2B8B5),
       onError: Color(0xFF601410),
-      surface: Color(0xFF1C1B1F),
-      onSurface: Color(0xFFE6E1E5),
-      surfaceContainerHighest: Color(0xFF49454F),
-      onSurfaceVariant: Color(0xFFCAC4D0),
-      outline: Color(0xFF938F99),
+      surface: Color(0xFF201A1A),
+      onSurface: Color(0xFFEDE0DF),
+      surfaceContainerHighest: Color(0xFF534342),
+      onSurfaceVariant: Color(0xFFD8C2C1),
+      outline: Color(0xFFA08C8B),
     ),
     textTheme: _textTheme,
     appBarTheme: const AppBarTheme(
       centerTitle: true,
       elevation: 0,
       scrolledUnderElevation: 1,
+      backgroundColor: Color(0xFF201A1A),
+      foregroundColor: Color(0xFFEDE0DF),
     ),
-    cardTheme: CardThemeData(
-      elevation: 0,
+    cardTheme: const CardThemeData(
+      elevation: 1,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFF49454F)),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
+      color: Color(0xFF201A1A),
+      surfaceTintColor: Colors.transparent,
     ),
   );
 }
