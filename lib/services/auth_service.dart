@@ -24,6 +24,9 @@ class AuthService {
         password: password,
       );
 
+      // Update Firebase Auth user's display name
+      await userCredential.user?.updateDisplayName(displayName);
+
       // Create user document in Firestore
       final userModel = UserModel(
         uid: userCredential.user!.uid,
@@ -101,8 +104,7 @@ class AuthService {
         }
 
         final googleUser = await _googleSignIn.authenticate();
-        final GoogleSignInAuthentication googleAuth =
-            googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
         final AuthCredential credential = GoogleAuthProvider.credential(
           idToken: googleAuth.idToken,
@@ -150,8 +152,8 @@ class AuthService {
     await _firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
-         // Auto retrieval or instant validation (only on android sometimes)
-         await _firebaseAuth.signInWithCredential(credential);
+        // Auto retrieval or instant validation (only on android sometimes)
+        await _firebaseAuth.signInWithCredential(credential);
       },
       verificationFailed: onVerificationFailed,
       codeSent: (String verificationId, int? resendToken) {
@@ -171,8 +173,9 @@ class AuthService {
         verificationId: verificationId,
         smsCode: smsCode,
       );
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
-      
+      final userCredential =
+          await _firebaseAuth.signInWithCredential(credential);
+
       // Check if user is new
       final userDoc = await _firebaseFirestore
           .collection('users')
@@ -205,6 +208,31 @@ class AuthService {
 
   /// Get current authenticated user
   User? get currentUser => _firebaseAuth.currentUser;
+
+  Future<String> getUserName() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) return 'User';
+
+    // First, try from user details
+    if (user.displayName != null && user.displayName!.trim().isNotEmpty) {
+      return user.displayName!;
+    }
+
+    // Fallback: fetch from database
+    try {
+      final doc =
+          await _firebaseFirestore.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null &&
+            data['displayName'] != null &&
+            data['displayName'].toString().trim().isNotEmpty) {
+          return data['displayName'].toString();
+        }
+      }
+    } catch (_) {}
+    return 'User';
+  }
 
   /// Listen to auth state changes
   Stream<User?> authStateChanges() {

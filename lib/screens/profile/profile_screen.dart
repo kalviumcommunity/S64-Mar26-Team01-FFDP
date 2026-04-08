@@ -1,147 +1,158 @@
 import 'package:flutter/material.dart';
-import '../../routes/app_routes.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Future<String> _userNameFuture;
+  final authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _userNameFuture = authService.getUserName();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final user = AuthService().currentUser;
-    // Accept optional message passed from another screen
-    final String? message =
-        ModalRoute.of(context)?.settings.arguments as String?;
+    final user = authService.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      backgroundColor: const Color(0xFFEBEAE5), // Cream background
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              // Passed argument banner (demonstrates pushNamed with arguments)
-              if (message != null) ...[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: theme.colorScheme.onPrimaryContainer,
-                        size: 18,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: FutureBuilder<String>(
+            future: _userNameFuture,
+            builder: (context, snapshot) {
+              final displayName = snapshot.data ?? 'No Name Set';
+              final initialLetter =
+                  displayName != 'No Name Set' && displayName.isNotEmpty
+                      ? displayName[0]
+                      : (user?.email?[0] ?? 'U');
+
+              return Column(
+                children: [
+                  // Title
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Profile',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Avatar
+                  Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFF9C8A8), // Peach
+                        border: Border.all(color: Colors.black, width: 2),
+                        boxShadow: const [
+                          BoxShadow(color: Colors.black, offset: Offset(4, 4))
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.transparent,
                         child: Text(
-                          message,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
+                          initialLetter.toUpperCase(),
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 40,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 24),
 
-              // Avatar
-              CircleAvatar(
-                radius: 48,
-                backgroundColor:
-                    theme.colorScheme.primary.withValues(alpha: 0.15),
-                child: Text(
-                  (user?.displayName?.isNotEmpty == true
-                          ? user!.displayName![0]
-                          : user?.email?[0] ?? 'U')
-                      .toUpperCase(),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                  Text(
+                    displayName,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Text(
-                user?.displayName ?? 'No Name Set',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                user?.email ?? 'No email',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Info cards
-              _InfoTile(
-                icon: Icons.email_outlined,
-                label: 'Email',
-                value: user?.email ?? '—',
-              ),
-              _InfoTile(
-                icon: Icons.verified_user_outlined,
-                label: 'Email Verified',
-                value: user?.emailVerified == true ? 'Yes' : 'No',
-              ),
-              _InfoTile(
-                icon: Icons.calendar_today_outlined,
-                label: 'Member Since',
-                value: user?.metadata.creationTime != null
-                    ? _formatDate(user!.metadata.creationTime!)
-                    : '—',
-              ),
-
-              const SizedBox(height: 32),
-
-              // Navigate with arguments demo
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    AppRoutes.settings,
-                    arguments: 'Navigated here from Profile screen',
+                  const SizedBox(height: 8),
+                  Text(
+                    user?.email ?? 'No email',
+                    style: GoogleFonts.lato(
+                      fontSize: 16,
+                      color: Colors.black54,
+                    ),
                   ),
-                  icon: const Icon(Icons.settings_outlined),
-                  label: const Text('Go to Settings'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 40),
+
+                  // Info cards
+                  _ProfileInfoCard(
+                    icon: Icons.email_outlined,
+                    label: 'Email',
+                    value: user?.email ?? '—',
                   ),
-                ),
-              ),
+                  const SizedBox(height: 16),
+                  _ProfileInfoCard(
+                    icon: Icons.verified_user_outlined,
+                    label: 'Email Verified',
+                    value: user?.emailVerified == true ? 'Yes' : 'No',
+                  ),
+                  const SizedBox(height: 16),
+                  _ProfileInfoCard(
+                    icon: Icons.calendar_today_outlined,
+                    label: 'Member Since',
+                    value: user?.metadata.creationTime != null
+                        ? _formatDate(user!.metadata.creationTime!)
+                        : '—',
+                  ),
 
-              const SizedBox(height: 12),
+                  const Spacer(),
 
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Back'),
-                ),
-              ),
-            ],
+                  // Log out Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => AuthService().signOut(),
+                      icon:
+                          const Icon(Icons.logout_rounded, color: Colors.white),
+                      label: Text(
+                        'Log Out',
+                        style: GoogleFonts.lato(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFF18698), // Pink Pop
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: const BorderSide(color: Colors.black, width: 2),
+                        ),
+                        elevation: 0,
+                      ).copyWith(
+                        shadowColor:
+                            WidgetStateProperty.all(Colors.transparent),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 100), // Padding for dock
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -153,12 +164,12 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class _InfoTile extends StatelessWidget {
+class _ProfileInfoCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
 
-  const _InfoTile({
+  const _ProfileInfoCard({
     required this.icon,
     required this.label,
     required this.value,
@@ -166,21 +177,42 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Icon(icon, color: theme.colorScheme.primary),
-        title: Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black, width: 1.5),
+        boxShadow: const [BoxShadow(color: Colors.black, offset: Offset(4, 4))],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black, size: 28),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.lato(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: GoogleFonts.playfairDisplay(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        subtitle: Text(value, style: theme.textTheme.bodyMedium),
+        ],
       ),
     );
   }

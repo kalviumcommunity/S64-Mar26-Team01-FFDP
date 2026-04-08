@@ -1,0 +1,281 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import '../../services/auth_service.dart';
+import '../../widgets/styled/gradient_background.dart';
+import '../../widgets/styled/glass_morphism.dart';
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late Future<String> _userNameFuture;
+  final authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _userNameFuture = authService.getUserName();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      body: GradientBackground(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 20, left: 24, right: 24, bottom: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome back,',
+                        style: GoogleFonts.oxygen(
+                          fontSize: 18,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      FutureBuilder<String>(
+                        future: _userNameFuture,
+                        builder: (context, snapshot) {
+                          final displayName = snapshot.data?.split(' ').first ?? 'User';
+                          return Text(
+                            displayName,
+                            style: GoogleFonts.raleway(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
+                      ),
+                      const SizedBox(height: 30),
+                      // Search Bar
+                      GestureDetector(
+                        onTap: () => context.go('/search'),
+                        child: _buildSearchBar(),
+                      ),
+                      const SizedBox(height: 40),
+                      // Section Title
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Top Rated Sitters',
+                            style: GoogleFonts.oxygen(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.go('/search'),
+                            child: Text(
+                              'See All',
+                              style: GoogleFonts.raleway(color: Colors.white70),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Horizontal list for sitters
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 220,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: dashboardSitters.length,
+                  itemBuilder: (context, index) {
+                    final sitter = dashboardSitters[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: _SitterCard(sitter: sitter, delayIndex: index),
+                    );
+                  },
+                ),
+              ),
+            ),
+            // Bottom space for dock padding
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+      ),
+      child: IgnorePointer(
+        child: TextField(
+          style: GoogleFonts.raleway(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Search for babysitters...',
+            hintStyle: GoogleFonts.raleway(color: Colors.white70),
+            prefixIcon: const Icon(Icons.search, color: Colors.white),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Minimal dummy data class for Dashboard
+class Sitter {
+  final String id;
+  final String name;
+  final double rating;
+  final String location;
+  final String imagePath;
+  Sitter(this.id, this.name, this.rating, this.location, this.imagePath);
+}
+
+final dashboardSitters = [
+  Sitter('s1', 'Priya Sharma', 4.9, '2 km away',
+      'https://randomuser.me/api/portraits/women/1.jpg'),
+  Sitter(
+      's2', 'Aarti Patel', 4.8, '5 km away', 'https://randomuser.me/api/portraits/women/5.jpg'),
+  Sitter(
+      's3', 'Neha Gupta', 5.0, '1 km away', 'https://randomuser.me/api/portraits/women/9.jpg'),
+];
+
+class _SitterCard extends StatefulWidget {
+  final Sitter sitter;
+  final int delayIndex;
+  const _SitterCard({required this.sitter, required this.delayIndex});
+
+  @override
+  State<_SitterCard> createState() => _SitterCardState();
+}
+
+class _SitterCardState extends State<_SitterCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 600));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    Future.delayed(Duration(milliseconds: 150 * widget.delayIndex), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _fadeAnimation.value,
+          child: Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          ),
+        );
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: () => context.push('/sitter/${widget.sitter.id}'),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+            child: GlassMorphism(
+              padding: const EdgeInsets.all(16),
+              borderRadius: BorderRadius.circular(24),
+              child: SizedBox(
+                width: 140,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundImage: NetworkImage(widget.sitter.imagePath),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.sitter.name,
+                      style: GoogleFonts.raleway(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.sitter.location,
+                      style: GoogleFonts.oxygen(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.star_rounded,
+                            color: Colors.orangeAccent, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.sitter.rating.toString(),
+                          style: GoogleFonts.raleway(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

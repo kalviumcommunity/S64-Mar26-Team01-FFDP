@@ -35,6 +35,8 @@ dependencies:
   intl: ^0.18.0
   flutter_local_notifications: ^16.1.0
   google_sign_in: ^7.2.0
+  google_fonts: ^8.0.2
+  lottie: ^3.3.2
 
 dev_dependencies:
   flutter_test:
@@ -50,3 +52,4 @@ flutter:
   assets:
     - public/logo.png
     - public/logo_white.png
+    - lib/lotties/
